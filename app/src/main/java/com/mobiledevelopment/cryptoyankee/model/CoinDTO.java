@@ -1,11 +1,13 @@
-package com.mobiledevelopment.cryptoyankee.models;
+package com.mobiledevelopment.cryptoyankee.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class CoinModel {
+public class CoinDTO {
     public String id;
     public String name;
     public String symbol;
