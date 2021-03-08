@@ -1,4 +1,4 @@
-package com.mobiledevelopment.cryptoyankee.utilities;
+package com.mobiledevelopment.cryptoyankee.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

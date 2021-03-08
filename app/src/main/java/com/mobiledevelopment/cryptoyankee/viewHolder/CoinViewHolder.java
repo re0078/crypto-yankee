@@ -1,4 +1,4 @@
-package com.mobiledevelopment.cryptoyankee.adaptars;
+package com.mobiledevelopment.cryptoyankee.viewHolder;
 
 import android.view.View;
 import android.widget.ImageView;

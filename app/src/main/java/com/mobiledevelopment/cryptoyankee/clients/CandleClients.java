@@ -12,7 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import com.mobiledevelopment.cryptoyankee.utilities.DateUtility;
+import com.mobiledevelopment.cryptoyankee.util.DateUtility;
 
 import org.jetbrains.annotations.NotNull;
 
