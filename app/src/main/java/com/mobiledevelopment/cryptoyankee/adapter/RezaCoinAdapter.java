@@ -1,4 +1,4 @@
-package com.mobiledevelopment.cryptoyankee.adaptars;
+package com.mobiledevelopment.cryptoyankee.adapter;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -12,21 +12,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.models.CoinModel;
+import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
 import java.util.List;
 
 //THIS WILL BE USED TO INFLATE THE DISPLAY!
-public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     ILoadMore iLoadMore;
     boolean isLoading;
     Activity activity;
-    List<CoinModel> items;
+    List<CoinDTO> items;
 
     int visibleThreshold = 5, lastVisibleItem, totalItemCount;
 
-    public CoinAdapter(RecyclerView recyclerView, Activity activity, List<CoinModel> items) {
+    public RezaCoinAdapter(RecyclerView recyclerView, Activity activity, List<CoinDTO> items) {
         this.activity = activity;
         this.items = items;
 
@@ -54,6 +55,7 @@ public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        Log.d("Chq", "On create view holder");
         View view = LayoutInflater.from(activity)
                 .inflate(R.layout.coin_layout, viewGroup, false);
         return new CoinViewHolder(view);
@@ -61,7 +63,7 @@ public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        CoinModel item = items.get(position);
+        CoinDTO item = items.get(position);
         CoinViewHolder holderItem = (CoinViewHolder) holder;
 
         float usd = Float.parseFloat(item.getPriceUsd());
@@ -142,9 +144,9 @@ public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         isLoading = false;
     }
 
-    public void updateData(List<CoinModel> coinModels) {
+    public void updateData(List<CoinDTO> coinDTOS) {
 
-        this.items = coinModels;
+        this.items = coinDTOS;
         notifyDataSetChanged();
     }
 }
