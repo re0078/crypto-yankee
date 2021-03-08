@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150sp"
+        android:background="@color/colorCoinBackground"
+        >
+
+
+        <!--CryptoCurrency Image-->
+        <ImageView
+            android:id="@+id/coin_icon"
+            android:layout_width="56sp"
+            android:layout_height="56sp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="30sp" />
+
+        <!--CryptoCurrency Initials -->
+        <TextView
+            android:id="@+id/coin_symbol"
+            android:layout_width="70sp"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/coin_icon"
+            android:layout_below="@+id/coin_icon"
+            android:layout_marginTop="10sp"
+            android:text="(BTC)"
+            android:textAlignment="center"
+            android:textColor="@color/colorTransparentWhite"
+            app:fontFamily="@font/unlockregular"
+            android:gravity="center_horizontal" />
+
+        <!--Divider-->
+        <TextView
+            android:id="@+id/coin_divider"
+            android:layout_width="10sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="85sp"
+            android:layout_marginTop="45sp"
+            android:text="|"
+            app:fontFamily="@font/cabinsketchregular"
+            android:textAlignment="center"
+            android:textColor="@color/colorCyanBlue"
+            android:gravity="center_horizontal" />
+
+        <!--CryptoCurrency Name-->
+        <TextView
+            android:id="@+id/coin_name"
+            android:layout_width="90sp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="100sp"
+            android:layout_marginTop="40sp"
+            android:text="Bitcoin"
+            app:fontFamily="@font/chakrapetchbold"
+            android:textAlignment="center"
+            android:textColor="@color/colorTransparentWhite"
+            android:gravity="center_horizontal" />
+
+        <!--CryptoCurrency Sign-->
+        <TextView
+            android:id="@+id/coin_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="230sp"
+            android:layout_marginTop="105sp"
+            android:text="$"
+            android:textSize="25sp"
+            app:fontFamily="@font/chakrapetchbold"
+            android:textAlignment="center"
+            android:textColor="@color/colorTransparentWhite"
+            android:gravity="center_horizontal" />
+
+        <!--CryptoCurrency Price-->
+        <TextView
+            android:id="@+id/priceUsdText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="255sp"
+            android:layout_marginTop="105sp"
+            android:text="USD"
+            app:fontFamily="@font/josefinslabregular"
+            android:textColor="@android:color/holo_orange_light"
+            android:textSize="35sp" />
+
+        <!--CryptoCurrency 1hr Watch!-->
+        <TextView
+            android:id="@+id/oneHourText"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="280sp"
+            android:layout_marginTop="20sp"
+            android:text="%1hr"
+            app:fontFamily="@font/poiretoneregular"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"/>
+
+
+        <!--CryptoCurrency Percentage 1hr% Change -->
+        <TextView
+            android:id="@+id/percentChange1hText"
+            android:layout_width="40sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="230sp"
+            android:layout_marginTop="20sp"
+            android:text="%1hr"
+            app:fontFamily="@font/josefinslabbold"
+            android:textColor="@color/colorTransparentWhite"/>
+
+
+        <!--CryptoCurrency 24hr Watch!-->
+        <TextView
+            android:id="@+id/twentyFourHourText"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="%24hr"
+            android:layout_marginLeft="280sp"
+            android:layout_marginTop="50sp"
+            android:textSize="16sp"
+            app:fontFamily="@font/poiretoneregular"
+            android:textColor="@color/colorAccent"/>
+
+
+        <!--CryptoCurrency Percentage 24hr% Change -->
+        <TextView
+            android:id="@+id/percentChange24hText"
+            android:layout_width="40sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50sp"
+            android:layout_marginLeft="230sp"
+            android:text="%24hr"
+            app:fontFamily="@font/josefinslabbold"
+            android:textColor="@color/colorTransparentWhite"/>
+
+
+        <!--CryptoCurrency 7days Watch!-->
+        <TextView
+            android:id="@+id/sevenDayText"
+            android:layout_width="80sp"
+            android:layout_height="wrap_content"
+            android:text="%7d"
+            android:layout_marginLeft="280sp"
+            android:layout_marginTop="80sp"
+            android:textSize="16sp"
+            app:fontFamily="@font/poiretoneregular"
+            android:textColor="@color/colorAccent"/>
+
+
+        <!--CryptoCurrency Percentage 7d Change -->
+        <TextView
+            android:id="@+id/percentChange7dText"
+            android:layout_width="40sp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="230sp"
+            android:text="%7d"
+            app:fontFamily="@font/josefinslabbold"
+            android:textColor="@color/colorTransparentWhite"
+            android:layout_marginTop="80sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.6sp"
+            android:layout_marginTop="148sp"
+            android:background="#7a253d54" />
+    </RelativeLayout>
+
+
+</RelativeLayout>
