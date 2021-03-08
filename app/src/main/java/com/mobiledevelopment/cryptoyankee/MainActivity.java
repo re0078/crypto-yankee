@@ -12,6 +12,8 @@ import com.mobiledevelopment.cryptoyankee.adaptars.CoinAdapter;
 import com.mobiledevelopment.cryptoyankee.models.CoinModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         // fetch items
 
         runOnUiThread(() -> {
-            List<CoinModel> newItems = List.of(testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem);
+            List<CoinModel> newItems = Arrays.asList(testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem);
             adapter.updateData(newItems);
 
         });
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadNext10coin(int index) {
-        List<CoinModel> newItems = List.of(new CoinModel("123", "bitcoin", "$", "50000", "3", "12", "20"));
+        List<CoinModel> newItems = Collections.singletonList(new CoinModel("123", "bitcoin", "$", "50000", "3", "12", "20"));
 
         // fetch new items
 

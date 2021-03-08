@@ -64,7 +64,7 @@ public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         CoinModel item = items.get(position);
         CoinViewHolder holderItem = (CoinViewHolder) holder;
 
-        float usd = Float.parseFloat(item.getPrice_usd());
+        float usd = Float.parseFloat(item.getPriceUsd());
         Log.d("USD", Float.toString(usd));
 
         usd = (usd * 1000000);
@@ -75,7 +75,7 @@ public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holderItem.coin_name.setText(item.getName());
         holderItem.coin_symbol.setText(item.getSymbol());
         holderItem.coin_price.setText(Float.toString(round));
-        holderItem.seven_days_change.setText(item.getPercent_change_7d() + "%");
+        holderItem.seven_days_change.setText(item.getPercentChange7D() + "%");
 
         //Load Images (Picasso)
 //        Picasso.with(activity)
@@ -87,41 +87,41 @@ public class CoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         try {
             //Percent_change_1h
-            if (item.getPercent_change_1h().contains("-")) {
-                String data = item.getPercent_change_1h().replace("-", "▼");
+            if (item.getPercentChange1H().contains("-")) {
+                String data = item.getPercentChange1H().replace("-", "▼");
                 holderItem.one_hour_change.setTextColor(Color.parseColor("#FF0000"));
                 holderItem.one_hour_change.setText(data);
-            } else if (!item.getPercent_change_1h().contains("-")) {
+            } else if (!item.getPercentChange1H().contains("-")) {
 
                 String data = "▲";
-                data = data.concat(item.getPercent_change_1h());
+                data = data.concat(item.getPercentChange1H());
                 holderItem.one_hour_change.setTextColor(Color.parseColor("#32CD32"));
                 holderItem.one_hour_change.setText(data);
             }
 
             //Percent_change_24h
-            if (item.getPercent_change_24h().contains("-")) {
-                String data = item.getPercent_change_24h().replace("-", "▼");
+            if (item.getPercentChange24H().contains("-")) {
+                String data = item.getPercentChange24H().replace("-", "▼");
                 holderItem.twenty_hours_change.setTextColor(Color.parseColor("#FF0000"));
                 holderItem.twenty_hours_change.setText(data);
-            } else if (!item.getPercent_change_24h().contains("-")) {
+            } else if (!item.getPercentChange24H().contains("-")) {
 
                 String data = "▲";
-                data = data.concat(item.getPercent_change_24h());
+                data = data.concat(item.getPercentChange24H());
                 holderItem.twenty_hours_change.setTextColor(Color.parseColor("#32CD32"));
                 holderItem.twenty_hours_change.setText(data);
 
             }
 
             //Percent_change_7d
-            if (item.getPercent_change_7d().contains("-")) {
-                String data = item.getPercent_change_7d().replace("-", "▼");
+            if (item.getPercentChange7D().contains("-")) {
+                String data = item.getPercentChange7D().replace("-", "▼");
                 holderItem.seven_days_change.setTextColor(Color.parseColor("#FF0000"));
                 holderItem.seven_days_change.setText(data);
-            } else if (!item.getPercent_change_7d().contains("-")) {
+            } else if (!item.getPercentChange7D().contains("-")) {
 
                 String data = "▲";
-                data = data.concat(item.getPercent_change_7d());
+                data = data.concat(item.getPercentChange7D());
                 holderItem.seven_days_change.setTextColor(Color.parseColor("#32CD32"));
                 holderItem.seven_days_change.setText(data);
 
