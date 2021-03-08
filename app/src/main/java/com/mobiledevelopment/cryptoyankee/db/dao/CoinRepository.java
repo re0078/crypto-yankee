@@ -4,14 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-
 import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.*;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

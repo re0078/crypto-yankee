@@ -16,6 +16,7 @@ import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
 import java.util.List;
+import java.util.Locale;
 
 //THIS WILL BE USED TO INFLATE THE DISPLAY!
 public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -66,7 +67,7 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         CoinDTO item = items.get(position);
         CoinViewHolder holderItem = (CoinViewHolder) holder;
 
-        float usd = Float.parseFloat(item.getPriceUsd());
+        float usd = Float.parseFloat(item.priceUsd);
         Log.d("USD", Float.toString(usd));
 
         usd = (usd * 1000000);
@@ -74,10 +75,11 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         float round = (float) (Math.round(usd) / 1000000.0);
         Log.d("ROUND", Float.toString(round));
 
-        holderItem.coin_name.setText(item.getName());
-        holderItem.coin_symbol.setText(item.getSymbol());
-        holderItem.coin_price.setText(Float.toString(round));
-        holderItem.seven_days_change.setText(item.getPercentChange7D() + "%");
+        holderItem.coin_name.setText(item.name);
+        holderItem.coin_symbol.setText(item.symbol);
+        holderItem.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));
+
+        holderItem.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.percentChange7D));
 
         //Load Images (Picasso)
 //        Picasso.with(activity)
@@ -89,41 +91,41 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         try {
             //Percent_change_1h
-            if (item.getPercentChange1H().contains("-")) {
-                String data = item.getPercentChange1H().replace("-", "▼");
+            if (item.percentChange1H.contains("-")) {
+                String data = item.percentChange1H.replace("-", "▼");
                 holderItem.one_hour_change.setTextColor(Color.parseColor("#FF0000"));
                 holderItem.one_hour_change.setText(data);
-            } else if (!item.getPercentChange1H().contains("-")) {
+            } else if (!item.percentChange1H.contains("-")) {
 
                 String data = "▲";
-                data = data.concat(item.getPercentChange1H());
+                data = data.concat(item.percentChange1H);
                 holderItem.one_hour_change.setTextColor(Color.parseColor("#32CD32"));
                 holderItem.one_hour_change.setText(data);
             }
 
             //Percent_change_24h
-            if (item.getPercentChange24H().contains("-")) {
-                String data = item.getPercentChange24H().replace("-", "▼");
+            if (item.percentChange24H.contains("-")) {
+                String data = item.percentChange24H.replace("-", "▼");
                 holderItem.twenty_hours_change.setTextColor(Color.parseColor("#FF0000"));
                 holderItem.twenty_hours_change.setText(data);
-            } else if (!item.getPercentChange24H().contains("-")) {
+            } else if (!item.percentChange24H.contains("-")) {
 
                 String data = "▲";
-                data = data.concat(item.getPercentChange24H());
+                data = data.concat(item.percentChange24H);
                 holderItem.twenty_hours_change.setTextColor(Color.parseColor("#32CD32"));
                 holderItem.twenty_hours_change.setText(data);
 
             }
 
             //Percent_change_7d
-            if (item.getPercentChange7D().contains("-")) {
-                String data = item.getPercentChange7D().replace("-", "▼");
+            if (item.percentChange7D.contains("-")) {
+                String data = item.percentChange7D.replace("-", "▼");
                 holderItem.seven_days_change.setTextColor(Color.parseColor("#FF0000"));
                 holderItem.seven_days_change.setText(data);
-            } else if (!item.getPercentChange7D().contains("-")) {
+            } else if (!item.percentChange7D.contains("-")) {
 
                 String data = "▲";
-                data = data.concat(item.getPercentChange7D());
+                data = data.concat(item.percentChange7D);
                 holderItem.seven_days_change.setTextColor(Color.parseColor("#32CD32"));
                 holderItem.seven_days_change.setText(data);
 
