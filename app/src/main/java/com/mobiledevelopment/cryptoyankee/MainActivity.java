@@ -67,11 +67,12 @@ public class MainActivity extends AppCompatActivity {
         coinModelConverter = CoinModelConverter.getInstance();
         //TODO add some sample coins to register some data in DB
         List<Coin> coins = new ArrayList<>();
+        coinRepository = CoinRepository.getInstance(getBaseContext());
         coinRepository.putCoins(coins);
         recyclerView = findViewById(R.id.coinList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        coinRepository = CoinRepository.getInstance(getBaseContext());
         coinAdapter = CoinAdapter.getInstance();
+        loadTenCoins();
         recyclerView.setAdapter(coinAdapter);
 /*
         adapter.setiLoadMore(() -> {
@@ -101,11 +102,13 @@ public class MainActivity extends AppCompatActivity {
 */
 
     private void loadTenCoins() {
-        List<Coin> coins = coinRepository.getTenCoins();
-        List<CoinDTO> coinDTOS = new ArrayList<>();
-        coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-        coinAdapter.setCoins(coinDTOS);
-        coinAdapter.notifyDataSetChanged();
+        runOnUiThread(() -> {
+            List<Coin> coins = coinRepository.getTenCoins();
+            List<CoinDTO> coinDTOS = new ArrayList<>();
+            coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
+            coinAdapter.setCoins(coinDTOS);
+            coinAdapter.notifyDataSetChanged();
+        });
     }
 
     private void storeCoins() {

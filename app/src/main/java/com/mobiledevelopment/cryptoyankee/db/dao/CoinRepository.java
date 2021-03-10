@@ -4,14 +4,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.*;
+import com.mobiledevelopment.cryptoyankee.db.entity.CoinContract;
+
+import static com.mobiledevelopment.cryptoyankee.db.entity.CoinContract.*;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.CURR_NAME;
+import static com.mobiledevelopment.cryptoyankee.db.entity.CoinContract.CURR_NAME;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CoinRepository {
@@ -28,7 +33,7 @@ public class CoinRepository {
     public List<Coin> getTenCoins() {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_PRICE_USD, D_PRICE_USD, W_PRICE_USD};
-        Cursor cursor = db.query(Coin.TABLE_NAME, columns, null, null,
+        Cursor cursor = db.query(TABLE_NAME, columns, null, null,
                 null, null, null, MAX_RECORDS + "," + offset);
         offset += MAX_RECORDS;
         List<Coin> coins = new ArrayList<>();
