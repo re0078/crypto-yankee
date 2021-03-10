@@ -24,19 +24,17 @@ public class CoinRepository {
     private static final CoinRepository COIN_REPOSITORY = new CoinRepository();
     private static final int MAX_RECORDS = 10;
     private CoinDBHelper coinDBHelper;
-    private Integer offset = 0;
 
     public static CoinRepository getInstance(Context context) {
         COIN_REPOSITORY.coinDBHelper = new CoinDBHelper(context);
         return COIN_REPOSITORY;
     }
 
-    public List<Coin> getTenCoins() {
+    public List<Coin> getTenCoins(int offset) {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_PRICE_USD, D_PRICE_USD, W_PRICE_USD};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
-                null, null, null, null);
-        offset += MAX_RECORDS;
+                null, null, null, offset + "," + MAX_RECORDS);
         List<Coin> coins = new ArrayList<>();
         while (cursor.moveToNext()) {
             coins.add(readCoin(cursor));

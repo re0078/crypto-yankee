@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait till loading is complete.", Toast.LENGTH_SHORT).show();
             // loading bar logic
-            loadTenCoins();
+//            loadTenCoins();
         });
         setupBeans();
     }
@@ -67,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupBeans() {
         coinModelConverter = CoinModelConverter.getInstance();
         //TODO add some sample coins to register some data in DB
-        List<Coin> coins = Arrays.asList(new Coin(1, "bitcoin", 1000, 1002, 1005, 1009));
+        List<Coin> coins = Arrays.asList(
+                new Coin(1, "bitcoin", 1000, 1002, 1005, 1009),
+                new Coin(1, "bitcoin", 1000, 1002, 1005, 1009));
         coinRepository = CoinRepository.getInstance(getBaseContext());
         coinRepository.deleteCoins();
         coinRepository.putCoins(coins);
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadTenCoins() {
         runOnUiThread(() -> {
-            List<Coin> coins = coinRepository.getTenCoins();
+            List<Coin> coins = coinRepository.getTenCoins(0);
             Log.d("coin", String.valueOf(coins.size()));
             List<CoinDTO> coinDTOS = new ArrayList<>();
             coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
