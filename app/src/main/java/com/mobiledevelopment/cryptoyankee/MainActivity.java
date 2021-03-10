@@ -16,6 +16,7 @@ import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,14 +67,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupBeans() {
         coinModelConverter = CoinModelConverter.getInstance();
         //TODO add some sample coins to register some data in DB
-        List<Coin> coins = new ArrayList<>();
+        List<Coin> coins = Arrays.asList(new Coin(1, "bitcoin", 1000, 1002, 1005, 1009));
         coinRepository = CoinRepository.getInstance(getBaseContext());
+        coinRepository.deleteCoins();
         coinRepository.putCoins(coins);
         recyclerView = findViewById(R.id.coinList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         coinAdapter = CoinAdapter.getInstance();
-        loadTenCoins();
         recyclerView.setAdapter(coinAdapter);
+        loadTenCoins();
 /*
         adapter.setiLoadMore(() -> {
             if (coins.size() <= 1000) //Max Size is 1000 coins
@@ -104,8 +106,10 @@ public class MainActivity extends AppCompatActivity {
     private void loadTenCoins() {
         runOnUiThread(() -> {
             List<Coin> coins = coinRepository.getTenCoins();
+            Log.d("coin", String.valueOf(coins.size()));
             List<CoinDTO> coinDTOS = new ArrayList<>();
             coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
+            Log.d("coin", String.valueOf(coinDTOS.size()));
             coinAdapter.setCoins(coinDTOS);
             coinAdapter.notifyDataSetChanged();
         });

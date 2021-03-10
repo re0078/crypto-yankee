@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 import com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry;
@@ -34,7 +35,7 @@ public class CoinRepository {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_PRICE_USD, D_PRICE_USD, W_PRICE_USD};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
-                null, null, null, MAX_RECORDS + "," + offset);
+                null, null, null, null);
         offset += MAX_RECORDS;
         List<Coin> coins = new ArrayList<>();
         while (cursor.moveToNext()) {
@@ -67,6 +68,11 @@ public class CoinRepository {
             String[] selectionArgs = {Integer.toString(coin.getId())};
             db.update(TABLE_NAME, setCoinValues(coin), selection, selectionArgs);
         });
+    }
+
+    public void deleteCoins() {
+        SQLiteDatabase db = coinDBHelper.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
     }
 
     private ContentValues setCoinValues(Coin coin) {
