@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
+import com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry;
 
 import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.*;
 
@@ -32,7 +33,7 @@ public class CoinRepository {
     public List<Coin> getTenCoins() {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_PRICE_USD, D_PRICE_USD, W_PRICE_USD};
-        Cursor cursor = db.query(Coin.TABLE_NAME, columns, null, null,
+        Cursor cursor = db.query(TABLE_NAME, columns, null, null,
                 null, null, null, MAX_RECORDS + "," + offset);
         offset += MAX_RECORDS;
         List<Coin> coins = new ArrayList<>();

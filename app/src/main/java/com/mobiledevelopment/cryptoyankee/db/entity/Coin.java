@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Coin {
-    public static final String TABLE_NAME = "coin";
-
     private Integer id;
     private String name;
     private Integer priceUsd;
