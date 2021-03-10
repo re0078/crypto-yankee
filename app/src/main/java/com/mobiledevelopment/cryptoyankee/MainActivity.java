@@ -1,5 +1,6 @@
 package com.mobiledevelopment.cryptoyankee;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,11 +14,10 @@ import com.mobiledevelopment.cryptoyankee.adapter.RezaCoinAdapter;
 import com.mobiledevelopment.cryptoyankee.db.dao.CoinRepository;
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.ui.CandleChartActivity;
 import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private List<CoinDTO> coins = new ArrayList<>();
 
     private final int TOTAL_PAGE_COINS = 1000;
+    private final String LOG_TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,48 +57,40 @@ public class MainActivity extends AppCompatActivity {
         coinRepository.putCoins(coins);
         recyclerView = findViewById(R.id.coinList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        coinAdapter = new RezaCoinAdapter(recyclerView);
+        coinAdapter = new RezaCoinAdapter(recyclerView, this);
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
             if (coins.size() <= TOTAL_PAGE_COINS) {
-                loadTenCoins();
+                loadExtraCoins();
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-/*
-    private void loadNext10coin(int index) {
-        List<CoinDTO> newItems = Collections.singletonList(new CoinDTO("123", "bitcoin", "$", "50000", "3", "12", "20"));
+    public void showUTLCChart(String coinName) {
+        Intent intent = new Intent(MainActivity.this, CandleChartActivity.class);
+        intent.putExtra(CandleChartActivity.COIN_NAME_KEY, coinName);
+        startActivity(intent);
+        Log.i(LOG_TAG, "UTLC Chart Activity Started");
+    }
+
+    public void loadExtraCoins() {
         runOnUiThread(() -> {
-            coins.addAll(newItems);
-//            adapter.setLoaded();
-            coinAdapter.setCoinItems(coins);
+//            List<Coin> coins = coinRepository.getTenCoins(); TODO
+            List<Coin> coins = new ArrayList<>();
+            coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
+            List<CoinDTO> coinDTOS = new ArrayList<>();
+            coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
+            coinAdapter.addExtraItems(coinDTOS);
             swipeRefreshLayout.setRefreshing(false);
         });
     }
-*/
-
-/*
-private void loadFirst10Coin(int index) {
-        swipeRefreshLayout.setRefreshing(true);
-        CoinDTO testItem = new CoinDTO("1", "bitcoin", "$", "50000", "3", "12", "20");
-        runOnUiThread(() -> {
-            List<CoinDTO> newItems = Arrays.asList(testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem, testItem);
-            coinAdapter.setCoinItems(newItems);
-            coinAdapter.notifyDataSetChanged();
-        });
-
-        if (swipeRefreshLayout.isRefreshing())
-            swipeRefreshLayout.setRefreshing(false);
-    }
-*/
 
     private void reloadTenCoins() {
         swipeRefreshLayout.setRefreshing(true);
         runOnUiThread(() -> {
-//            List<Coin> coins = coinRepository.reloadTenCoins();
+//            List<Coin> coins = coinRepository.getFirstTenCoins(); TODO
             List<Coin> coins = new ArrayList<>();
             coins.add(new Coin(1, "bitcoin2", 2000, 46, 788, 1000));
             adaptLoadedCoins(coins);
@@ -108,7 +101,7 @@ private void loadFirst10Coin(int index) {
 
     private void loadTenCoins() {
         runOnUiThread(() -> {
-//            List<Coin> coins = coinRepository.getTenCoins();
+//            List<Coin> coins = coinRepository.getTenCoins(); TODO
             List<Coin> coins = new ArrayList<>();
             coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
             adaptLoadedCoins(coins);

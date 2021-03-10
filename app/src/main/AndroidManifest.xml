@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LoadingActivity">
+        <activity android:name=".ui.CandleChartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST" />
 

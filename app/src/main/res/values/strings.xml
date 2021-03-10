@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">CryptoYankee</string>
     <string name="refresh_button">Refresh</string>
+    <string name="last_week">LAST WEEK</string>
+    <string name="last_month">LAST MONTH</string>
+    <string name="weekly_candles">WEEKLY CANDLES</string>
+    <string name="monthly_candles">MONTHLY CANDLES</string>
 </resources>

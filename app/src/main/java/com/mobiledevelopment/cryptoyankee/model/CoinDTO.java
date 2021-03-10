@@ -8,7 +8,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@ToString
 public class CoinDTO {
     public String id;
     public String name;

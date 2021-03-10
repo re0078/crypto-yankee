@@ -1,5 +1,6 @@
 package com.mobiledevelopment.cryptoyankee.adapter;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
+import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
@@ -24,14 +27,14 @@ import lombok.Setter;
 public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     @Setter
     private List<CoinDTO> coinItems;
+    private Activity activity;
     private Loadable loadable;
     private boolean isLoading;
     private final int VISIBLE_THRESHOLD = 5;
 
-    int lastVisibleItem, totalItemCount;
-
-    public RezaCoinAdapter(RecyclerView recyclerView) {
+    public RezaCoinAdapter(RecyclerView recyclerView, Activity activity) {
         this.coinItems = new ArrayList<>();
+        this.activity = activity;
 
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -39,8 +42,8 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 assert linearLayoutManager != null;
-                totalItemCount = linearLayoutManager.getItemCount();
-                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
                 if (!isLoading && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)) {
                     if (loadable != null)
                         loadable.onLoadMore();
@@ -56,6 +59,7 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
         Log.d("Chq", "On create view holder");
         View view = LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.coin_layout, parent, false);
+        view.setOnClickListener(v -> ((MainActivity) activity).showUTLCChart(((TextView) view.findViewById(R.id.coin_name)).getText().toString()));
         return new CoinViewHolder(view);
     }
 
@@ -65,7 +69,8 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
         float usd = Float.parseFloat(item.priceUsd) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
-
+        Log.d("Value_Bug", item.toString());
+        Log.d("Value_Bug", String.format(Locale.ENGLISH, "%f", round));
         holder.coin_name.setText(item.name);
         holder.coin_symbol.setText(item.symbol);
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));
@@ -97,6 +102,11 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
             textView.setTextColor(Color.parseColor("#32CD32"));
             textView.setText(data);
         }
+    }
+
+    public void addExtraItems(List<CoinDTO> items) {
+        coinItems.addAll(items);
+        notifyDataSetChanged();
     }
 
     @Override

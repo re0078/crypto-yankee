@@ -44,7 +44,7 @@ public class CoinRepository {
         return coins;
     }
 
-    public List<Coin> reloadTenCoins() {
+    public List<Coin> getFirstTenCoins() {
         offset.set(0);
         return getTenCoins();
     }
