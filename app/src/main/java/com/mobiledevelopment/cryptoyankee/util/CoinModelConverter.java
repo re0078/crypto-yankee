@@ -1,7 +1,11 @@
 package com.mobiledevelopment.cryptoyankee.util;
 
+import android.util.Log;
+
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
+
+import java.util.Locale;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,11 +34,17 @@ public class CoinModelConverter {
         CoinDTO coinDTO = new CoinDTO();
         coinDTO.setId(Integer.toString(coin.getId()));
         coinDTO.setName(coin.getName());
-        coinDTO.setPriceUsd(Integer.toBinaryString(coin.getPriceUsd()));
-        //TODO formula conversion from percentage to price
-        coinDTO.setPercentChange1H(Integer.toBinaryString(coin.getHPriceUsd()));
-        coinDTO.setPercentChange24H(Integer.toBinaryString(coin.getDPriceUsd()));
-        coinDTO.setPercentChange7D(Integer.toBinaryString(coin.getWPriceUsd()));
+
+        coinDTO.setPriceUsd(String.format(Locale.ENGLISH, "%f", coin.getPriceUsd()));
+
+        coinDTO.setPercentChange1H(String.format(Locale.ENGLISH, "%.2f", calcDiffPercentage(coin.getHPriceUsd(), coin.getPriceUsd())));
+        coinDTO.setPercentChange24H(String.format(Locale.ENGLISH, "%.2f", calcDiffPercentage(coin.getDPriceUsd(), coin.getPriceUsd())));
+        coinDTO.setPercentChange7D(String.format(Locale.ENGLISH, "%.2f", calcDiffPercentage(coin.getWPriceUsd(), coin.getPriceUsd())));
+
         return coinDTO;
+    }
+
+    private double calcDiffPercentage(float part, float whole) {
+        return part * 100.0 / (whole - part);
     }
 }

@@ -99,7 +99,7 @@ private void loadFirst10Coin(int index) {
         runOnUiThread(() -> {
 //            List<Coin> coins = coinRepository.reloadTenCoins();
             List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin", 5000, 46, 788, 1000));
+            coins.add(new Coin(1, "bitcoin2", 2000, 46, 788, 1000));
             adaptLoadedCoins(coins);
         });
         if (swipeRefreshLayout.isRefreshing())
@@ -110,7 +110,7 @@ private void loadFirst10Coin(int index) {
         runOnUiThread(() -> {
 //            List<Coin> coins = coinRepository.getTenCoins();
             List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin", 5000, 46, 788, 1000));
+            coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
             adaptLoadedCoins(coins);
         });
     }
