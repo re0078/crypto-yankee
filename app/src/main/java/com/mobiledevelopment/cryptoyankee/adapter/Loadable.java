@@ -1,5 +1,5 @@
 package com.mobiledevelopment.cryptoyankee.adapter;
 
-public interface ILoadMore {
+public interface Loadable {
     void onLoadMore();
 }

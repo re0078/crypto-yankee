@@ -6,24 +6,24 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import com.mobiledevelopment.cryptoyankee.db.entity.CoinContract;
 
-import static com.mobiledevelopment.cryptoyankee.db.entity.CoinContract.*;
+import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import static com.mobiledevelopment.cryptoyankee.db.entity.CoinContract.CURR_NAME;
+import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.CURR_NAME;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CoinRepository {
     private static final CoinRepository COIN_REPOSITORY = new CoinRepository();
     private static final int MAX_RECORDS = 10;
     private CoinDBHelper coinDBHelper;
-    private Integer offset = 0;
+    private AtomicInteger offset = new AtomicInteger(0);
 
     public static CoinRepository getInstance(Context context) {
         COIN_REPOSITORY.coinDBHelper = new CoinDBHelper(context);
@@ -34,14 +34,19 @@ public class CoinRepository {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_PRICE_USD, D_PRICE_USD, W_PRICE_USD};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
-                null, null, null, MAX_RECORDS + "," + offset);
-        offset += MAX_RECORDS;
+                null, null, null, MAX_RECORDS + "," + offset.get());
+        offset.addAndGet(MAX_RECORDS);
         List<Coin> coins = new ArrayList<>();
         while (cursor.moveToNext()) {
             coins.add(readCoin(cursor));
         }
         cursor.close();
         return coins;
+    }
+
+    public List<Coin> reloadTenCoins() {
+        offset.set(0);
+        return getTenCoins();
     }
 
     private Coin readCoin(Cursor cursor) {
