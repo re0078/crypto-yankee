@@ -18,7 +18,6 @@ import java.util.Objects;
 
 public class CandleChartActivity extends AppCompatActivity {
 
-    private String currentCoinName;
     private boolean weeklyCandlesOn = true;
     private CandlesDTO candlesDTO;
 
@@ -27,7 +26,7 @@ public class CandleChartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
-        currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
+        String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
         swipeRefreshLayout.post(this::load_candles);
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -52,10 +51,11 @@ public class CandleChartActivity extends AppCompatActivity {
     private void load_candles() {
         runOnUiThread(() -> {
             // initialize candles (both weekly and monthly) from candles service TODO
-            candlesDTO = new CandlesDTO("bitcoin",
+            candlesDTO = new CandlesDTO("1", "bitcoin",
                     new ArrayList<>(),
                     new ArrayList<>()
             );
+
         });
     }
 

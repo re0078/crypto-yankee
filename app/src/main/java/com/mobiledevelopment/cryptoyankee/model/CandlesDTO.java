@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 public class CandlesDTO {
+    public String coinId;
     public String coinName;
     public ArrayList<CandlesChartItems> weeklyCandles;
     public ArrayList<CandlesChartItems> monthlyCandles;
