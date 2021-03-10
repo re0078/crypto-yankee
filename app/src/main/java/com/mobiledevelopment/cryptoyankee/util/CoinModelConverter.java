@@ -1,7 +1,8 @@
 package com.mobiledevelopment.cryptoyankee.util;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.model.coin.ServerCoinDTO;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -36,5 +37,14 @@ public class CoinModelConverter {
         coinDTO.setPercentChange24H(Integer.toBinaryString(coin.getDPriceUsd()));
         coinDTO.setPercentChange7D(Integer.toBinaryString(coin.getWPriceUsd()));
         return coinDTO;
+    }
+
+    public CoinDTO getCoinDTO(ServerCoinDTO serverCoinDTO) {
+        return new CoinDTO(String.valueOf(serverCoinDTO.getId()), serverCoinDTO.getName(),
+                serverCoinDTO.getSymbol(),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getPrice()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getHPrice()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getDPrice()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getWPrice()));
     }
 }

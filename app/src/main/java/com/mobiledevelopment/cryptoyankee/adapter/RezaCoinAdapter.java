@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
 import java.util.List;
