@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Coin {
-    private Integer id;
+    private int id;
     private String name;
-    private Integer priceUsd;
-    private Integer hPriceUsd;
-    private Integer dPriceUsd;
-    private Integer wPriceUsd;
+    private int priceUsd;
+    private int hPriceUsd;
+    private int dPriceUsd;
+    private int wPriceUsd;
 }

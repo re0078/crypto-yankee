@@ -76,8 +76,6 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 //                .load(new StringBuilder("https://res.cloudinary.com/dxi90ksom/image/upload/")
 //                        .append(item.getSymbol().toLowerCase()).append(".png").toString())
 //                .into(holderItem.coin_icon);
-//▼▾▲▴
-//        This section of code Change the color of text to Red incase of a drop and Green incase of a rise!
 
         try {
             bindPercentChangeViews(holder.one_hour_change, item.percentChange1H);
