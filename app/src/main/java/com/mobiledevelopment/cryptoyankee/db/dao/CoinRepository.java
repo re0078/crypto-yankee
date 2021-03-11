@@ -11,7 +11,6 @@ import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -23,30 +22,23 @@ public class CoinRepository {
     private static final CoinRepository COIN_REPOSITORY = new CoinRepository();
     private static final int MAX_RECORDS = 10;
     private CoinDBHelper coinDBHelper;
-    private AtomicInteger offset = new AtomicInteger(0);
 
     public static CoinRepository getInstance(Context context) {
         COIN_REPOSITORY.coinDBHelper = new CoinDBHelper(context);
         return COIN_REPOSITORY;
     }
 
-    public List<Coin> getTenCoins() {
+    public List<Coin> getTenCoins(int offset) {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
-                null, null, null, MAX_RECORDS + "," + offset.get());
-        offset.addAndGet(MAX_RECORDS);
+                null, null, null, offset + "," + MAX_RECORDS);
         List<Coin> coins = new ArrayList<>();
         while (cursor.moveToNext()) {
             coins.add(readCoin(cursor));
         }
         cursor.close();
         return coins;
-    }
-
-    public List<Coin> getFirstTenCoins() {
-        offset.set(0);
-        return getTenCoins();
     }
 
     private Coin readCoin(Cursor cursor) {
@@ -72,6 +64,11 @@ public class CoinRepository {
             String[] selectionArgs = {Integer.toString(coin.getId())};
             db.update(TABLE_NAME, setCoinValues(coin), selection, selectionArgs);
         });
+    }
+
+    public void deleteCoins() {
+        SQLiteDatabase db = coinDBHelper.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
     }
 
     private ContentValues setCoinValues(Coin coin) {

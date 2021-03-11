@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.mobiledevelopment.cryptoyankee.adapter.RezaCoinAdapter;
-import com.mobiledevelopment.cryptoyankee.adapter.CoinAdapter;
 import com.mobiledevelopment.cryptoyankee.communication.ApiService;
 import com.mobiledevelopment.cryptoyankee.db.dao.CoinRepository;
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.ui.CandleChartActivity;
 import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.model.exception.ApiConnectivityException;
@@ -36,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private List<CoinDTO> coins = new ArrayList<>();
 
     private final int TOTAL_PAGE_COINS = 1000;
-    private final String LOG_TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +61,9 @@ public class MainActivity extends AppCompatActivity {
         coinRepository.putCoins(coins);
         recyclerView = findViewById(R.id.coinList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        coinAdapter = CoinAdapter.getInstance();
-//        coinAdapter.setCoins(Collections.emptyList());
-        coinAdapter = new RezaCoinAdapter(recyclerView, this);
+        coinAdapter = new RezaCoinAdapter(this);
+        coinAdapter.initialize(recyclerView);
         recyclerView.setAdapter(coinAdapter);
-//        loadTenCoins();
-        fetchFiveCoins();
         coinAdapter.setLoadable(() -> {
             if (coins.size() <= TOTAL_PAGE_COINS) {
                 loadExtraCoins();
@@ -83,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, CandleChartActivity.class);
         intent.putExtra(CandleChartActivity.COIN_NAME_KEY, coinName);
         startActivity(intent);
+        String LOG_TAG = "MainActivity";
         Log.i(LOG_TAG, "UTLC Chart Activity Started");
     }
 
@@ -90,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(() -> {
 //            List<Coin> coins = coinRepository.getTenCoins(); TODO
             List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
+            coins.add(new Coin(1, "bitcoin", 2000.0, 46.0, 7.8, 100.0));
             List<CoinDTO> coinDTOS = new ArrayList<>();
             coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
             coinAdapter.addExtraItems(coinDTOS);
@@ -101,10 +96,14 @@ public class MainActivity extends AppCompatActivity {
     private void reloadTenCoins() {
         swipeRefreshLayout.setRefreshing(true);
         runOnUiThread(() -> {
-//            List<Coin> coins = coinRepository.getFirstTenCoins(); TODO
-            List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin2", 2000, 46, 788, 1000));
-            adaptLoadedCoins(coins);
+            try {
+                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
+                coinAdapter.setCoinDTOS(coinDTOS);
+                coinAdapter.notifyDataSetChanged();
+                storeCoins(coinDTOS);
+            } catch (ApiConnectivityException e) {
+                loadTenCoins();
+            }
         });
         if (swipeRefreshLayout.isRefreshing())
             swipeRefreshLayout.setRefreshing(false);
@@ -113,14 +112,6 @@ public class MainActivity extends AppCompatActivity {
     private void loadTenCoins() {
         runOnUiThread(() -> {
             List<Coin> coins = coinRepository.getTenCoins(0);
-            List<CoinDTO> coinDTOS = new ArrayList<>();
-            coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-            coinAdapter.setCoins(coinDTOS);
-            coinAdapter.notifyDataSetChanged();
-        });
-//            List<Coin> coins = coinRepository.getTenCoins(); TODO
-            List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
             adaptLoadedCoins(coins);
         });
     }
@@ -128,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
     private void adaptLoadedCoins(List<Coin> coins) {
         List<CoinDTO> coinDTOS = new ArrayList<>();
         coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-        coinAdapter.setCoinItems(coinDTOS);
+        coinAdapter.setCoinDTOS(coinDTOS);
         coinAdapter.notifyDataSetChanged();
     }
 
@@ -137,18 +128,5 @@ public class MainActivity extends AppCompatActivity {
         coinDTOS.forEach(coinDTO -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
         coinRepository.putCoins(coins);
 //        coinRepository.updateCoins(coins);
-    }
-
-    private void fetchFiveCoins() {
-        runOnUiThread(() -> {
-            try {
-                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
-                coinAdapter.setCoins(coinDTOS);
-                coinAdapter.notifyDataSetChanged();
-                storeCoins(coinDTOS);
-            } catch (ApiConnectivityException e) {
-                loadTenCoins();
-            }
-        });
     }
 }
