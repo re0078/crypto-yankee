@@ -1,5 +1,7 @@
 package com.mobiledevelopment.cryptoyankee.ui;
 
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -9,7 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
 import com.mobiledevelopment.cryptoyankee.R;
+import com.mobiledevelopment.cryptoyankee.model.CandlesChartItems;
 import com.mobiledevelopment.cryptoyankee.model.CandlesDTO;
 
 import java.util.ArrayList;
@@ -34,17 +42,18 @@ public class CandleChartActivity extends AppCompatActivity {
                     "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             load_candles();
         });
+        draw_chart(candlesDTO.weeklyCandles);
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
     }
 
     private void toggleCandles(View view) {
         weeklyCandlesOn = !weeklyCandlesOn;
         // TODO change to chart
-        TextView textView = findViewById(R.id.candlesTextView);
+
         if (weeklyCandlesOn) {
-            textView.setText("candlesDTO.weeklyCandles.toString()");
+            draw_chart(candlesDTO.weeklyCandles);
         } else {
-            textView.setText("candlesDTO.monthlyCandles.toString()");
+            draw_chart(candlesDTO.monthlyCandles);
         }
     }
 
@@ -59,5 +68,38 @@ public class CandleChartActivity extends AppCompatActivity {
         });
     }
 
+    private void draw_chart(ArrayList<CandlesChartItems> list) {
+        ArrayList<CandleEntry> entries = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            float mul = list.size() + 10;
+            float val = (float) (Math.random() * 100) + mul;
+
+            float high = (float) (list.get(i).priceClose) + 8f;
+            float low = (float) (list.get(i).priceOpen) + 8f;
+
+            float open = (float) (list.get(i).timestampOpen) + 1f;
+            float close = (float) (list.get(i).timestampClose) + 1f;
+
+            boolean odd = i % 2 != 0;
+            entries.add(new CandleEntry(i + 1, val + high,
+                    val - low,
+                    !odd ? val + open : val - open,
+                    odd ? val - close : val + close
+            ));
+        }
+        CandleDataSet candleDataSet = new CandleDataSet(entries, candlesDTO.coinName);
+        candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        candleDataSet.setShadowColor(Color.GRAY);
+        candleDataSet.setShadowWidth(0.5f);
+        candleDataSet.setDecreasingColor(Color.RED);
+        candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+        candleDataSet.setIncreasingColor(Color.GREEN);
+        candleDataSet.setNeutralColor(Color.BLUE);
+        CandleStickChart candleStickChart = findViewById(R.id.candle_stick_chart);
+        CandleData candleData = new CandleData(candleDataSet);
+        candleStickChart.setData(candleData);
+        candleStickChart.invalidate();
+    }
     public static final String COIN_NAME_KEY = "coin_name";
 }

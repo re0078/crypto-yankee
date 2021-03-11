@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class CandlesChartItems {
-    public Date timestampOpen;
-    public Date timestampClose;
+    public float timestampOpen;
+    public float timestampClose;
     public float priceOpen;
     public float priceClose;
 }
