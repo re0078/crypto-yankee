@@ -1,5 +1,9 @@
 package com.mobiledevelopment.cryptoyankee.model.coin;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class ServerCoinDTO {
     @JsonProperty("id")
     private Integer id;
@@ -22,6 +29,9 @@ public class ServerCoinDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
     public static class Quote {
         @JsonProperty("USD")
         private USD usd;
@@ -29,15 +39,18 @@ public class ServerCoinDTO {
         @AllArgsConstructor
         @NoArgsConstructor
         @Data
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
         public static class USD {
             @JsonProperty("price")
-            private Float price;
+            private Double price;
             @JsonProperty("percent_change_1h")
-            private Float hPrice;
+            private Double hChange;
             @JsonProperty("percent_change_24h")
-            private Float dPrice;
+            private Double dChange;
             @JsonProperty("percent_change_7d")
-            private Float wPrice;
+            private Double wChange;
         }
     }
 }
