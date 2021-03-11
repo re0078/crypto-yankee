@@ -19,7 +19,9 @@ import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -28,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoinRepository coinRepository;
     private CoinModelConverter coinModelConverter;
-    private List<CoinDTO> coins = new ArrayList<>();
+    private List<CoinDTO> coinsDTOs = new ArrayList<>();
+    private AtomicInteger offset = new AtomicInteger(0);
 
     private final int TOTAL_PAGE_COINS = 1000;
     private final String LOG_TAG = "MainActivity";
@@ -39,17 +42,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Log.d("Chq", "Main");
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
-        swipeRefreshLayout = findViewById(R.id.rootLayout);
-        swipeRefreshLayout.post(this::loadTenCoins);
+        setupBeans();
+        runProcessWithLoading(this::initializeCoins);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
-            //TODO: loading bar implementation
-            reloadTenCoins();
+            runProcessWithLoading(this::reloadTenCoins);
         });
-        setupBeans();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        storeCoins();
     }
 
     private void setupBeans() {
+        swipeRefreshLayout = findViewById(R.id.rootLayout);
         coinModelConverter = CoinModelConverter.getInstance();
         //TODO add some sample coins to register some data in DB
         List<Coin> coins = new ArrayList<>();
@@ -60,12 +69,61 @@ public class MainActivity extends AppCompatActivity {
         coinAdapter = new RezaCoinAdapter(recyclerView, this);
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
-            if (coins.size() <= TOTAL_PAGE_COINS) {
-                loadExtraCoins();
+            if (coinsDTOs.size() <= TOTAL_PAGE_COINS) {
+                runProcessWithLoading(this::loadExtraCoins);
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void runProcessWithLoading(Runnable runnable) {
+        runOnUiThread(() -> {
+            swipeRefreshLayout.setRefreshing(true);
+            runnable.run();
+            swipeRefreshLayout.setRefreshing(false);
+        });
+    }
+
+    public void loadExtraCoins() {
+        List<Coin> coins = coinRepository.getTenCoins(offset.get());
+        offset.addAndGet(coins.size());
+
+//        List<Coin> coins = new ArrayList<>();
+//        coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
+
+        List<CoinDTO> coinDTOS = new ArrayList<>();
+        coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
+
+        coinAdapter.addExtraItems(coinDTOS);
+    }
+
+    private void reloadTenCoins() {
+        List<Coin> coins = coinRepository.getTenCoins(0);
+        offset.set(coins.size());
+
+//        List<Coin> coins = new ArrayList<>();
+//        coins.add(new Coin(1, "bitcoin2", 2000, 46, 788, 1000));
+
+        adaptLoadedCoins(coins);
+    }
+
+    private void initializeCoins() {
+        List<Coin> coins = coinRepository.getTenCoins(0);
+        offset.set(coins.size());
+
+//        List<Coin> coins = new ArrayList<>();
+//        coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
+
+        adaptLoadedCoins(coins);
+    }
+
+    private void adaptLoadedCoins(List<Coin> coins) {
+        List<CoinDTO> coinDTOS = new ArrayList<>();
+        Log.d("NULL_ERROR", String.format(Locale.ENGLISH, "%b, %b", coins == null, coinModelConverter == null));
+        coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
+        coinAdapter.setCoinItems(coinDTOS);
+        coinAdapter.notifyDataSetChanged();
     }
 
     public void showUTLCChart(String coinName) {
@@ -75,50 +133,9 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "UTLC Chart Activity Started");
     }
 
-    public void loadExtraCoins() {
-        runOnUiThread(() -> {
-//            List<Coin> coins = coinRepository.getTenCoins(); TODO
-            List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
-            List<CoinDTO> coinDTOS = new ArrayList<>();
-            coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-            coinAdapter.addExtraItems(coinDTOS);
-            swipeRefreshLayout.setRefreshing(false);
-        });
-    }
-
-    private void reloadTenCoins() {
-        swipeRefreshLayout.setRefreshing(true);
-        runOnUiThread(() -> {
-//            List<Coin> coins = coinRepository.getFirstTenCoins(); TODO
-            List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin2", 2000, 46, 788, 1000));
-            adaptLoadedCoins(coins);
-        });
-        if (swipeRefreshLayout.isRefreshing())
-            swipeRefreshLayout.setRefreshing(false);
-    }
-
-    private void loadTenCoins() {
-        runOnUiThread(() -> {
-//            List<Coin> coins = coinRepository.getTenCoins(); TODO
-            List<Coin> coins = new ArrayList<>();
-            coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
-            adaptLoadedCoins(coins);
-        });
-    }
-
-    private void adaptLoadedCoins(List<Coin> coins) {
-        List<CoinDTO> coinDTOS = new ArrayList<>();
-        coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-        coinAdapter.setCoinItems(coinDTOS);
-        coinAdapter.notifyDataSetChanged();
-    }
-
     private void storeCoins() {
-        List<CoinDTO> coinDTOS = new ArrayList<>();
         List<Coin> coins = new ArrayList<>();
-        coinDTOS.forEach(coinDTO -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
+        coinsDTOs.forEach(coinDTO -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
         coinRepository.updateCoins(coins);
     }
 }
