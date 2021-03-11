@@ -4,10 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry;
 
 import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.*;
 
@@ -32,7 +30,7 @@ public class CoinRepository {
 
     public List<Coin> getTenCoins(int offset) {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
-        String[] columns = {_ID, CURR_NAME, PRICE_USD, H_PRICE_USD, D_PRICE_USD, W_PRICE_USD};
+        String[] columns = {_ID, CURR_NAME, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
                 null, null, null, offset + "," + MAX_RECORDS);
         List<Coin> coins = new ArrayList<>();
@@ -47,10 +45,10 @@ public class CoinRepository {
         Coin coin = new Coin();
         coin.setId(cursor.getInt(cursor.getColumnIndexOrThrow(_ID)));
         coin.setName(cursor.getString(cursor.getColumnIndexOrThrow(CURR_NAME)));
-        coin.setPriceUsd(cursor.getInt(cursor.getColumnIndexOrThrow(PRICE_USD)));
-        coin.setHPriceUsd(cursor.getInt(cursor.getColumnIndexOrThrow(H_PRICE_USD)));
-        coin.setDPriceUsd(cursor.getInt(cursor.getColumnIndexOrThrow(D_PRICE_USD)));
-        coin.setWPriceUsd(cursor.getInt(cursor.getColumnIndexOrThrow(W_PRICE_USD)));
+        coin.setPriceUsd(cursor.getDouble(cursor.getColumnIndexOrThrow(PRICE_USD)));
+        coin.setHChangePercentage(cursor.getDouble(cursor.getColumnIndexOrThrow(H_CHANGE_PERCENT)));
+        coin.setDChangePercentage(cursor.getDouble(cursor.getColumnIndexOrThrow(D_CHANGE_PERCENT)));
+        coin.setWChangePercentage(cursor.getDouble(cursor.getColumnIndexOrThrow(W_CHANGE_PERCENT)));
         return coin;
     }
 
@@ -77,9 +75,9 @@ public class CoinRepository {
         ContentValues values = new ContentValues();
         values.put(CURR_NAME, coin.getName());
         values.put(PRICE_USD, coin.getPriceUsd());
-        values.put(H_PRICE_USD, coin.getHPriceUsd());
-        values.put(D_PRICE_USD, coin.getDPriceUsd());
-        values.put(W_PRICE_USD, coin.getWPriceUsd());
+        values.put(H_CHANGE_PERCENT, coin.getHChangePercentage());
+        values.put(D_CHANGE_PERCENT, coin.getDChangePercentage());
+        values.put(W_CHANGE_PERCENT, coin.getWChangePercentage());
         return values;
     }
 }

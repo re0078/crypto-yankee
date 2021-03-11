@@ -19,11 +19,10 @@ public class CoinModelConverter {
         Coin coin = new Coin();
         coin.setId(Integer.parseInt(coinDTO.id));
         coin.setName(coinDTO.name);
-        coin.setPriceUsd(Integer.parseInt(coinDTO.priceUsd));
-        //TODO formula conversion from percentage to price
-        coin.setHPriceUsd(Integer.parseInt(coinDTO.percentChange1H));
-        coin.setDPriceUsd(Integer.parseInt(coinDTO.percentChange1H));
-        coin.setWPriceUsd(Integer.parseInt(coinDTO.percentChange7D));
+        coin.setPriceUsd(Double.parseDouble(coinDTO.priceUsd));
+        coin.setHChangePercentage(Double.parseDouble(coinDTO.percentChange1H));
+        coin.setDChangePercentage(Double.parseDouble(coinDTO.percentChange24H));
+        coin.setWChangePercentage(Double.parseDouble(coinDTO.percentChange7D));
         return coin;
     }
 
@@ -31,11 +30,10 @@ public class CoinModelConverter {
         CoinDTO coinDTO = new CoinDTO();
         coinDTO.setId(Integer.toString(coin.getId()));
         coinDTO.setName(coin.getName());
-        coinDTO.setPriceUsd(Integer.toBinaryString(coin.getPriceUsd()));
-        //TODO formula conversion from percentage to price
-        coinDTO.setPercentChange1H(Integer.toBinaryString(coin.getHPriceUsd()));
-        coinDTO.setPercentChange24H(Integer.toBinaryString(coin.getDPriceUsd()));
-        coinDTO.setPercentChange7D(Integer.toBinaryString(coin.getWPriceUsd()));
+        coinDTO.setPriceUsd(Double.toString(coin.getPriceUsd()));
+        coinDTO.setPercentChange1H(Double.toString(coin.getHChangePercentage()));
+        coinDTO.setPercentChange24H(Double.toString(coin.getDChangePercentage()));
+        coinDTO.setPercentChange7D(Double.toString(coin.getWChangePercentage()));
         return coinDTO;
     }
 
@@ -43,8 +41,8 @@ public class CoinModelConverter {
         return new CoinDTO(String.valueOf(serverCoinDTO.getId()), serverCoinDTO.getName(),
                 serverCoinDTO.getSymbol(),
                 String.valueOf(serverCoinDTO.getQuote().getUsd().getPrice()),
-                String.valueOf(serverCoinDTO.getQuote().getUsd().getHPrice()),
-                String.valueOf(serverCoinDTO.getQuote().getUsd().getDPrice()),
-                String.valueOf(serverCoinDTO.getQuote().getUsd().getWPrice()));
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getHChange()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getDChange()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getWChange()));
     }
 }

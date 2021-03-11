@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 public class Coin {
     private Integer id;
     private String name;
-    private Integer priceUsd;
-    private Integer hPriceUsd;
-    private Integer dPriceUsd;
-    private Integer wPriceUsd;
+    private Double priceUsd;
+    private Double hChangePercentage;
+    private Double dChangePercentage;
+    private Double wChangePercentage;
 }
