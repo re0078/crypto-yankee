@@ -18,7 +18,6 @@ import com.mobiledevelopment.cryptoyankee.model.exception.ApiConnectivityExcepti
 import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,10 +37,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Chq", "Main");
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         swipeRefreshLayout = findViewById(R.id.rootLayout);
-        swipeRefreshLayout.post(this::loadTenCoins);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait till loading is complete.", Toast.LENGTH_SHORT).show();
-            fetchTenCoins();
+//            fetchTenCoins();
         });
         setupBeans();
     }
@@ -49,21 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupBeans() {
         apiService = ApiService.getInstance(getResources());
         coinModelConverter = CoinModelConverter.getInstance();
-        //TODO add some sample coins to register some data in DB
-/*
-        List<Coin> coins = Arrays.asList(
-                new Coin(1, "bitcoin", 1000, 1002, 1005, 1009),
-                new Coin(1, "bitcoin", 1000, 1002, 1005, 1009));
-*/
         coinRepository = CoinRepository.getInstance(getBaseContext());
         coinRepository.deleteCoins();
-//        coinRepository.putCoins(coins);
         recyclerView = findViewById(R.id.coinList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         coinAdapter = CoinAdapter.getInstance();
+//        coinAdapter.setCoins(Collections.emptyList());
         recyclerView.setAdapter(coinAdapter);
 //        loadTenCoins();
-        fetchTenCoins();
+        fetchFiveCoins();
     }
 
     private void loadTenCoins() {
@@ -79,14 +71,14 @@ public class MainActivity extends AppCompatActivity {
     private void storeCoins(List<CoinDTO> coinDTOS) {
         List<Coin> coins = new ArrayList<>();
         coinDTOS.forEach(coinDTO -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
-        coinRepository.updateCoins(coins);
+        coinRepository.putCoins(coins);
+//        coinRepository.updateCoins(coins);
     }
 
-    private void fetchTenCoins() {
+    private void fetchFiveCoins() {
         runOnUiThread(() -> {
-            List<CoinDTO> coinDTOS;
             try {
-                coinDTOS = apiService.getCoinsInfo(1);
+                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
                 coinAdapter.setCoins(coinDTOS);
                 coinAdapter.notifyDataSetChanged();
                 storeCoins(coinDTOS);

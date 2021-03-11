@@ -51,9 +51,10 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
         //TODO complete ui stuff
         holder.coin_name.setText(item.getName());
         holder.coin_symbol.setText(item.getSymbol());
-//        holder.coin_price.setText(Float.toString(round));
-//        holder.one_hour_change.setText(Float.toString(item.getPercentChange1H()));
-//        holder.seven_days_change.setText(item.getPercentChange7D() + "%");
+        holder.coin_price.setText(item.getPriceUsd());
+        holder.one_hour_change.setText(item.getPercentChange1H().concat("%"));
+        holder.seven_days_change.setText(item.getPercentChange24H().concat("%"));
+        holder.seven_days_change.setText(item.getPercentChange7D().concat("%"));
     }
 
     @Override

@@ -7,6 +7,6 @@
     <string name="convert_key">convert</string>
     <string name="usd_val">USD</string>
     <string name="limit_key">limit</string>
-    <string name="fetch_limit">10</string>
+    <string name="fetch_limit">5</string>
     <string name="start_key">start</string>
 </resources>
