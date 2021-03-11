@@ -6,138 +6,116 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
+import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-//THIS WILL BE USED TO INFLATE THE DISPLAY!
-public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+import lombok.Setter;
 
-    ILoadMore iLoadMore;
-    boolean isLoading;
-    Activity activity;
-    List<CoinDTO> items;
+public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
+    @Setter
+    private List<CoinDTO> coinItems;
+    private Activity activity;
+    private Loadable loadable;
+    private boolean isLoading;
+    private final int VISIBLE_THRESHOLD = 5;
 
-    int visibleThreshold = 5, lastVisibleItem, totalItemCount;
-
-    public RezaCoinAdapter(RecyclerView recyclerView, Activity activity, List<CoinDTO> items) {
+    public RezaCoinAdapter(RecyclerView recyclerView, Activity activity) {
+        this.coinItems = new ArrayList<>();
         this.activity = activity;
-        this.items = items;
 
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                totalItemCount = linearLayoutManager.getItemCount();
-                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                    if (iLoadMore != null)
-                        iLoadMore.onLoadMore();
+                assert linearLayoutManager != null;
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                if (!isLoading && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)) {
+                    if (loadable != null)
+                        loadable.onLoadMore();
                     isLoading = true;
                 }
             }
         });
     }
 
-
-    public void setiLoadMore(ILoadMore iLoadMore) {
-        this.iLoadMore = iLoadMore;
-    }
-
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public CoinViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("Chq", "On create view holder");
-        View view = LayoutInflater.from(activity)
-                .inflate(R.layout.coin_layout, viewGroup, false);
+        View view = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.coin_layout, parent, false);
+        view.setOnClickListener(v -> ((MainActivity) activity).showUTLCChart(((TextView) view.findViewById(R.id.coin_name)).getText().toString()));
         return new CoinViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        CoinDTO item = items.get(position);
-        CoinViewHolder holderItem = (CoinViewHolder) holder;
+    public void onBindViewHolder(@NonNull CoinViewHolder holder, int position) {
+        CoinDTO item = coinItems.get(position);
 
-        float usd = Float.parseFloat(item.getPriceUsd());
-        Log.d("USD", Float.toString(usd));
-
-        usd = (usd * 1000000);
-        Log.d("ROUNDUSD", Float.toString(usd));
+        float usd = Float.parseFloat(item.priceUsd) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
-        Log.d("ROUND", Float.toString(round));
-
-        holderItem.coin_name.setText(item.getName());
-        holderItem.coin_symbol.setText(item.getSymbol());
-        holderItem.coin_price.setText(Float.toString(round));
-        holderItem.seven_days_change.setText(item.getPercentChange7D() + "%");
+        Log.d("Value_Bug", item.toString());
+        Log.d("Value_Bug", String.format(Locale.ENGLISH, "%f", round));
+        holder.coin_name.setText(item.name);
+        holder.coin_symbol.setText(item.symbol);
+        holder.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));
+        holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.percentChange7D));
 
         //Load Images (Picasso)
 //        Picasso.with(activity)
 //                .load(new StringBuilder("https://res.cloudinary.com/dxi90ksom/image/upload/")
 //                        .append(item.getSymbol().toLowerCase()).append(".png").toString())
 //                .into(holderItem.coin_icon);
-//▼▾▲▴
-//        This section of code Change the color of text to Red incase of a drop and Green incase of a rise!
 
         try {
-            //Percent_change_1h
-            if (item.getPercentChange1H().contains("-")) {
-                String data = item.getPercentChange1H().replace("-", "▼");
-                holderItem.one_hour_change.setTextColor(Color.parseColor("#FF0000"));
-                holderItem.one_hour_change.setText(data);
-            } else if (!item.getPercentChange1H().contains("-")) {
-
-                String data = "▲";
-                data = data.concat(item.getPercentChange1H());
-                holderItem.one_hour_change.setTextColor(Color.parseColor("#32CD32"));
-                holderItem.one_hour_change.setText(data);
-            }
-
-            //Percent_change_24h
-            if (item.getPercentChange24H().contains("-")) {
-                String data = item.getPercentChange24H().replace("-", "▼");
-                holderItem.twenty_hours_change.setTextColor(Color.parseColor("#FF0000"));
-                holderItem.twenty_hours_change.setText(data);
-            } else if (!item.getPercentChange24H().contains("-")) {
-
-                String data = "▲";
-                data = data.concat(item.getPercentChange24H());
-                holderItem.twenty_hours_change.setTextColor(Color.parseColor("#32CD32"));
-                holderItem.twenty_hours_change.setText(data);
-
-            }
-
-            //Percent_change_7d
-            if (item.getPercentChange7D().contains("-")) {
-                String data = item.getPercentChange7D().replace("-", "▼");
-                holderItem.seven_days_change.setTextColor(Color.parseColor("#FF0000"));
-                holderItem.seven_days_change.setText(data);
-            } else if (!item.getPercentChange7D().contains("-")) {
-
-                String data = "▲";
-                data = data.concat(item.getPercentChange7D());
-                holderItem.seven_days_change.setTextColor(Color.parseColor("#32CD32"));
-                holderItem.seven_days_change.setText(data);
-
-            }
+            bindPercentChangeViews(holder.one_hour_change, item.percentChange1H);
+            bindPercentChangeViews(holder.twenty_hours_change, item.percentChange24H);
+            bindPercentChangeViews(holder.seven_days_change, item.percentChange7D);
         } catch (Exception e) {
-            Log.d("Color_Error", e.getMessage());
+            Log.d("ColorError", e.getMessage());
         }
-
     }
 
+    private void bindPercentChangeViews(TextView textView, String percentageValue) {
+        if (percentageValue.contains("-")) {
+            String data = percentageValue.replace("-", "▼");
+            textView.setTextColor(Color.parseColor("#FF0000"));
+            textView.setText(data);
+        } else if (!percentageValue.contains("-")) {
+            String data = "▲";
+            data = data.concat(percentageValue);
+            textView.setTextColor(Color.parseColor("#32CD32"));
+            textView.setText(data);
+        }
+    }
+
+    public void addExtraItems(List<CoinDTO> items) {
+        coinItems.addAll(items);
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return coinItems.size();
+    }
+
+    public void setLoadable(Loadable loadable) {
+        this.loadable = loadable;
     }
 
     public void setLoaded() {
@@ -145,8 +123,7 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void updateData(List<CoinDTO> coinDTOS) {
-
-        this.items = coinDTOS;
+        this.coinItems = coinDTOS;
         notifyDataSetChanged();
     }
 }

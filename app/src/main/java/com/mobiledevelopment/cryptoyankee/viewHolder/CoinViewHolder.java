@@ -17,12 +17,12 @@ public class CoinViewHolder extends RecyclerView.ViewHolder{
     public CoinViewHolder(View itemView) {
         super(itemView);
 
-        coin_icon = (ImageView)itemView.findViewById(R.id.coin_icon);
-        coin_symbol = (TextView)itemView.findViewById(R.id.coin_symbol);
-        coin_name = (TextView)itemView.findViewById(R.id.coin_name);
-        coin_price = (TextView)itemView.findViewById(R.id.priceUsdText);
-        one_hour_change = (TextView)itemView.findViewById(R.id.oneHourText);
-        twenty_hours_change = (TextView)itemView.findViewById(R.id.twentyFourHourText);
-        seven_days_change = (TextView)itemView.findViewById(R.id.sevenDayText);
+        coin_icon = itemView.findViewById(R.id.coin_icon);
+        coin_symbol = itemView.findViewById(R.id.coin_symbol);
+        coin_name = itemView.findViewById(R.id.coin_name);
+        coin_price = itemView.findViewById(R.id.priceUsdText);
+        one_hour_change = itemView.findViewById(R.id.oneHourText);
+        twenty_hours_change = itemView.findViewById(R.id.twentyFourHourText);
+        seven_days_change = itemView.findViewById(R.id.sevenDayText);
     }
 }
