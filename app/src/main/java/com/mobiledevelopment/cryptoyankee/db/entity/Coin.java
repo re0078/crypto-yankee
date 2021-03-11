@@ -9,10 +9,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @Data
 public class Coin {
-    private int id;
+    private Integer id;
     private String name;
-    private float priceUsd;
-    private float hPriceUsd;
-    private float dPriceUsd;
-    private float wPriceUsd;
+    private Double priceUsd;
+    private Double hChangePercentage;
+    private Double dChangePercentage;
+    private Double wChangePercentage;
 }

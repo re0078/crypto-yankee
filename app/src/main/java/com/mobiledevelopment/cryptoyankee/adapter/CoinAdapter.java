@@ -4,14 +4,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
-import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +39,22 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CoinViewHolder holder, int position) {
+        CoinDTO item = coins.get(position);
+        float usd = Float.parseFloat(item.getPriceUsd());
+        Log.d("USD", Float.toString(usd));
 
+        usd = (usd * 1000000);
+        Log.d("ROUNDUSD", Float.toString(usd));
+        float round = (float) (Math.round(usd) / 1000000.0);
+        Log.d("ROUND", Float.toString(round));
+
+        //TODO complete ui stuff
+        holder.coin_name.setText(item.getName());
+        holder.coin_symbol.setText(item.getSymbol());
+        holder.coin_price.setText(item.getPriceUsd());
+        holder.one_hour_change.setText(item.getPercentChange1H().concat("%"));
+        holder.seven_days_change.setText(item.getPercentChange24H().concat("%"));
+        holder.seven_days_change.setText(item.getPercentChange7D().concat("%"));
     }
 
     @Override

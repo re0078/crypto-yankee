@@ -1,11 +1,8 @@
 package com.mobiledevelopment.cryptoyankee.util;
 
-import android.util.Log;
-
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import com.mobiledevelopment.cryptoyankee.model.CoinDTO;
-
-import java.util.Locale;
+import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.model.coin.ServerCoinDTO;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -22,11 +19,10 @@ public class CoinModelConverter {
         Coin coin = new Coin();
         coin.setId(Integer.parseInt(coinDTO.id));
         coin.setName(coinDTO.name);
-        coin.setPriceUsd(Integer.parseInt(coinDTO.priceUsd));
-        //TODO formula conversion from percentage to price
-        coin.setHPriceUsd(Integer.parseInt(coinDTO.percentChange1H));
-        coin.setDPriceUsd(Integer.parseInt(coinDTO.percentChange1H));
-        coin.setWPriceUsd(Integer.parseInt(coinDTO.percentChange7D));
+        coin.setPriceUsd(Double.parseDouble(coinDTO.priceUsd));
+        coin.setHChangePercentage(Double.parseDouble(coinDTO.percentChange1H));
+        coin.setDChangePercentage(Double.parseDouble(coinDTO.percentChange24H));
+        coin.setWChangePercentage(Double.parseDouble(coinDTO.percentChange7D));
         return coin;
     }
 
@@ -34,17 +30,19 @@ public class CoinModelConverter {
         CoinDTO coinDTO = new CoinDTO();
         coinDTO.setId(Integer.toString(coin.getId()));
         coinDTO.setName(coin.getName());
-
-        coinDTO.setPriceUsd(String.format(Locale.ENGLISH, "%f", coin.getPriceUsd()));
-
-        coinDTO.setPercentChange1H(String.format(Locale.ENGLISH, "%.2f", calcDiffPercentage(coin.getHPriceUsd(), coin.getPriceUsd())));
-        coinDTO.setPercentChange24H(String.format(Locale.ENGLISH, "%.2f", calcDiffPercentage(coin.getDPriceUsd(), coin.getPriceUsd())));
-        coinDTO.setPercentChange7D(String.format(Locale.ENGLISH, "%.2f", calcDiffPercentage(coin.getWPriceUsd(), coin.getPriceUsd())));
-
+        coinDTO.setPriceUsd(Double.toString(coin.getPriceUsd()));
+        coinDTO.setPercentChange1H(Double.toString(coin.getHChangePercentage()));
+        coinDTO.setPercentChange24H(Double.toString(coin.getDChangePercentage()));
+        coinDTO.setPercentChange7D(Double.toString(coin.getWChangePercentage()));
         return coinDTO;
     }
 
-    private double calcDiffPercentage(float part, float whole) {
-        return part * 100.0 / (whole - part);
+    public CoinDTO getCoinDTO(ServerCoinDTO serverCoinDTO) {
+        return new CoinDTO(String.valueOf(serverCoinDTO.getId()), serverCoinDTO.getName(),
+                serverCoinDTO.getSymbol(),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getPrice()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getHChange()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getDChange()),
+                String.valueOf(serverCoinDTO.getQuote().getUsd().getWChange()));
     }
 }

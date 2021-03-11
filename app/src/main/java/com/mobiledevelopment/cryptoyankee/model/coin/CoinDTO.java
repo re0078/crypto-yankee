@@ -1,4 +1,4 @@
-package com.mobiledevelopment.cryptoyankee.model;
+package com.mobiledevelopment.cryptoyankee.model.coin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
