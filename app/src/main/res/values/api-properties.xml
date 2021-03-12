@@ -7,6 +7,7 @@
     <string name="convert_key">convert</string>
     <string name="usd_val">USD</string>
     <string name="limit_key">limit</string>
-    <string name="fetch_limit">5</string>
+    <integer name="fetch_limit">5</integer>
     <string name="start_key">start</string>
+    <integer name="max_poll">20</integer>
 </resources>

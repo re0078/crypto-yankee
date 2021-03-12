@@ -87,7 +87,7 @@ public class ApiService {
     private Request buildFetchCoinsInfoRequest(int offset) {
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(resources.getString(R.string.info_api))).
                 newBuilder().
-                addQueryParameter(resources.getString(R.string.limit_key), resources.getString(R.string.fetch_limit)).
+                addQueryParameter(resources.getString(R.string.limit_key), String.valueOf(resources.getInteger(R.integer.fetch_limit))).
                 addQueryParameter(resources.getString(R.string.convert_key), resources.getString(R.string.usd_val)).
                 addQueryParameter(resources.getString(R.string.start_key), String.valueOf(offset));
         return new Request.Builder().

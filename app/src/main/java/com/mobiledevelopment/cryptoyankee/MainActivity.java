@@ -22,6 +22,9 @@ import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -32,54 +35,44 @@ public class MainActivity extends AppCompatActivity {
     private CoinRepository coinRepository;
     private CoinModelConverter coinModelConverter;
     private ApiService apiService;
-    private List<CoinDTO> coins = new ArrayList<>();
-    private List<CoinDTO> coinsDTOs = new ArrayList<>();
-    private AtomicInteger offset = new AtomicInteger(0);
+    private final SortedMap<Integer, CoinDTO> coinsMap = new TreeMap<>();
+    private Integer loadLimit;
+    private Integer maxCoinsCount;
+    private Integer nonCompletePage;
+    private final AtomicInteger offset = new AtomicInteger(0);
+    private final AtomicBoolean hasCachedData = new AtomicBoolean(false);
 
-    private final int TOTAL_PAGE_COINS = 1000;
     private final String LOG_TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.coin_main);
-        Log.d("Chq", "Main");
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(this::loadTenCoins);
+        runProcessWithLoading(this::loadCoins);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
-            runProcessWithLoading(this::reloadTenCoins);
+            runProcessWithLoading(this::fetchCoins);
         });
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        storeCoins(coinsDTOs);
+        storeCoins(hasCachedData.get());
     }
 
     private void setupBeans() {
+        loadLimit = getResources().getInteger(R.integer.fetch_limit);
+        maxCoinsCount = getResources().getInteger(R.integer.max_poll);
+        nonCompletePage = (maxCoinsCount % loadLimit) == 0 ? 0 : 1;
         apiService = ApiService.getInstance(getResources());
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         coinModelConverter = CoinModelConverter.getInstance();
-        //TODO add some sample coins to register some data in DB
-        List<Coin> coins = new ArrayList<>();
-        coinRepository = CoinRepository.getInstance(getBaseContext());
+        coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
         coinRepository.deleteCoins();
-        coinRepository.putCoins(coins);
-        recyclerView = findViewById(R.id.coinList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        coinAdapter = new CoinAdapter(recyclerView, this);
-        recyclerView.setAdapter(coinAdapter);
-        coinAdapter.setLoadable(() -> {
-            if (coinsDTOs.size() <= TOTAL_PAGE_COINS) {
-                runProcessWithLoading(this::loadExtraCoins);
-            } else {
-                Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
-            }
-        });
+        initAdapter();
     }
 
     private void runProcessWithLoading(Runnable runnable) {
@@ -91,35 +84,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadExtraCoins() {
-        List<Coin> coins = coinRepository.getTenCoins(offset.get());
-        offset.addAndGet(coins.size());
-        List<CoinDTO> coinDTOS = new ArrayList<>();
-        coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-
-        coinAdapter.addExtraItems(coinDTOS);
+        int from = offset.get();
+        List<Coin> coins = coinRepository.getLimitedCoins(from);
+        int to = offset.addAndGet(coins.size());
+        coins.forEach(coin -> coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin)));
+        adaptLoadedCoins(from, to);
     }
 
-    private void reloadTenCoins() {
+    private void fetchCoins() {
         try {
-            List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
-            adaptLoadedCoins(coinDTOS);
-            storeCoins(coinDTOS);
+            for (int i = 0; i < maxCoinsCount / loadLimit + nonCompletePage; i++) {
+                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
+                coinDTOS.forEach(coinDTO -> coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO));
+                adaptLoadedCoins(i * loadLimit, (i + 1) * loadLimit);
+            }
         } catch (ApiConnectivityException e) {
-            loadTenCoins();
+            loadCoins();
         }
     }
 
-    private void loadTenCoins() {
-        List<Coin> coins = coinRepository.getTenCoins(0);
-        offset.set(coins.size());
-        List<CoinDTO> coinDTOS = new ArrayList<>();
-        coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-
-        adaptLoadedCoins(coinDTOS);
+    private void loadCoins() {
+        List<Coin> coins = coinRepository.getLimitedCoins(0);
+        coins.forEach(coin -> coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin)));
+        int size = coins.size();
+        adaptLoadedCoins(0, size);
+        offset.addAndGet(size);
+        hasCachedData.set(size != 0);
     }
 
-    private void adaptLoadedCoins(List<CoinDTO> coins) {
-        coinAdapter.setCoinDTOS(coins);
+    private void adaptLoadedCoins(int from, int to) {
+        coinAdapter.getCoinDTOS().addAll(coinsMap.subMap(from, to).values());
         coinAdapter.notifyDataSetChanged();
     }
 
@@ -130,10 +124,26 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "UTLC Chart Activity Started");
     }
 
-    private void storeCoins(List<CoinDTO> coinDTOS) {
+    private void storeCoins(boolean isUpdate) {
         List<Coin> coins = new ArrayList<>();
-        coinDTOS.forEach(coinDTO -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
-        coinRepository.putCoins(coins);
-//        coinRepository.updateCoins(coins);
+        coinsMap.forEach((id, coinDTO) -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
+        if (isUpdate)
+            coinRepository.updateCoins(coins);
+        else
+            coinRepository.putCoins(coins);
+    }
+
+    private void initAdapter() {
+        recyclerView = findViewById(R.id.coinList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        coinAdapter = new CoinAdapter(recyclerView, this, loadLimit);
+        recyclerView.setAdapter(coinAdapter);
+        coinAdapter.setLoadable(() -> {
+            if (coinsMap.size() <= maxCoinsCount) {
+                runProcessWithLoading(this::loadExtraCoins);
+            } else {
+                Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,22 +21,27 @@ import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
-    private Activity activity;
+    private final Activity activity;
+    @Getter
+    private final List<CoinDTO> coinDTOS;
     @Setter
-    private List<CoinDTO> coinDTOS;
     private Loadable loadable;
     private boolean isLoading;
-    private final int VISIBLE_THRESHOLD = 5;
 
-    public CoinAdapter(RecyclerView recyclerView, Activity activity) {
+    public CoinAdapter(RecyclerView recyclerView, Activity activity, int loadLimit) {
         this.coinDTOS = new ArrayList<>();
         this.activity = activity;
+        AtomicInteger visibleThreshold = new AtomicInteger(5);
+        if (loadLimit != 0)
+            visibleThreshold.set(loadLimit);
 
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -45,7 +51,7 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
                 assert linearLayoutManager != null;
                 int totalItemCount = linearLayoutManager.getItemCount();
                 int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                if (!isLoading && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)) {
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
                     if (loadable != null)
                         loadable.onLoadMore();
                     isLoading = true;
@@ -80,12 +86,6 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));
         holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.percentChange7D));
 
-        //Load Images (Picasso)
-//        Picasso.with(activity)
-//                .load(new StringBuilder("https://res.cloudinary.com/dxi90ksom/image/upload/")
-//                        .append(item.getSymbol().toLowerCase()).append(".png").toString())
-//                .into(holderItem.coin_icon);
-
         try {
             bindPercentChangeViews(holder.one_hour_change, item.percentChange1H);
             bindPercentChangeViews(holder.twenty_hours_change, item.percentChange24H);
@@ -108,26 +108,11 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
         }
     }
 
-    public void addExtraItems(List<CoinDTO> items) {
-        coinDTOS.addAll(items);
-        notifyDataSetChanged();
-    }
-
     @Override
     public int getItemCount() {
+        if (coinDTOS.isEmpty())
+            Toast.makeText(activity, "There is no cached data. " +
+                    "Please swipe down to fetch online data from server", Toast.LENGTH_LONG).show();
         return coinDTOS.size();
-    }
-
-    public void setLoadable(Loadable loadable) {
-        this.loadable = loadable;
-    }
-
-    public void setLoaded() {
-        isLoading = false;
-    }
-
-    public void updateData(List<CoinDTO> coinDTOS) {
-        this.coinDTOS = coinDTOS;
-        notifyDataSetChanged();
     }
 }

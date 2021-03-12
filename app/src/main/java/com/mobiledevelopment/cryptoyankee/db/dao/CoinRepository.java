@@ -20,19 +20,20 @@ import static com.mobiledevelopment.cryptoyankee.db.entity.CoinEntry.CURR_NAME;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CoinRepository {
     private static final CoinRepository COIN_REPOSITORY = new CoinRepository();
-    private static final int MAX_RECORDS = 10;
+    private int maxRecords = 5;
     private CoinDBHelper coinDBHelper;
 
-    public static CoinRepository getInstance(Context context) {
+    public static CoinRepository getInstance(Context context, int maxRecords) {
         COIN_REPOSITORY.coinDBHelper = new CoinDBHelper(context);
+        COIN_REPOSITORY.maxRecords = maxRecords;
         return COIN_REPOSITORY;
     }
 
-    public List<Coin> getTenCoins(int offset) {
+    public List<Coin> getLimitedCoins(int offset) {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
         String[] columns = {_ID, CURR_NAME, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
-                null, null, null, offset + "," + MAX_RECORDS);
+                null, null, null, offset + "," + maxRecords);
         List<Coin> coins = new ArrayList<>();
         while (cursor.moveToNext()) {
             coins.add(readCoin(cursor));
