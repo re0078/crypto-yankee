@@ -69,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
         loadLimit = getResources().getInteger(R.integer.fetch_limit);
         maxCoinsCount = getResources().getInteger(R.integer.max_poll);
         nonCompletePage = (maxCoinsCount % loadLimit) == 0 ? 0 : 1;
-        apiService = ApiService.getInstance();
+        apiService = ApiService.getInstance(getResources());
         threadPoolService = ThreadPoolService.getInstance();
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         modelConverter = ModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
-//        coinRepository.deleteCoins();
+        coinRepository.deleteCoins();
         initAdapter();
     }
 

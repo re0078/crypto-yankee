@@ -38,7 +38,7 @@ public class CandleChartActivity extends AppCompatActivity {
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
         threadPoolService = ThreadPoolService.getInstance();
-        ApiService apiService = ApiService.getInstance();
+        ApiService apiService = ApiService.getInstance(getResources());
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         String currentCoinSymbol = getIntent().getStringExtra(COIN_SYMBOL_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);

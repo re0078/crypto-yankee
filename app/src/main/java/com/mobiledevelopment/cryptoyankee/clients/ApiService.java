@@ -42,8 +42,8 @@ public class ApiService {
     private ObjectMapper objectMapper;
     private ModelConverter converter;
 
-    public static ApiService getInstance() {
-        API_UTIL.resources = Resources.getSystem();
+    public static ApiService getInstance(Resources resources) {
+        API_UTIL.resources = resources;
         API_UTIL.client = new OkHttpClient();
         API_UTIL.objectMapper = new ObjectMapper();
         API_UTIL.objectMapper.setVisibility(API_UTIL.objectMapper.getSerializationConfig().
