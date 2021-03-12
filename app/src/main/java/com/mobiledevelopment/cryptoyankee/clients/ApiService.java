@@ -100,10 +100,14 @@ public class ApiService {
 
     public CandlesDTO getCandleInfo(String symbol, LocalDateTime startWeek, LocalDateTime startMonth) {
         CandlesDTO candlesDTO = new CandlesDTO();
+        Log.d("week_tag", symbol + startWeek);
         Request request = buildFetchCandlesInfoRequest(symbol, startWeek);
+        Log.d("req1_tag", request.toString());
         candlesDTO.setWeeklyCandles(callCandlesInfoApi(request));
-        request = buildFetchCandlesInfoRequest(symbol, startMonth);
-        candlesDTO.setMonthlyCandles(callCandlesInfoApi(request));
+        Log.d("month_tag", symbol + startMonth);
+        Request request2 = buildFetchCandlesInfoRequest(symbol, startMonth);
+        Log.d("req2_tag", request2.toString());
+        candlesDTO.setMonthlyCandles(callCandlesInfoApi(request2));
         return candlesDTO;
     }
 
@@ -135,6 +139,7 @@ public class ApiService {
             }
         });
         lockCompletableFuture.join();
+        Log.d("number_tag", Integer.toString(items.size()));
         return items;
     }
 

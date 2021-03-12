@@ -3,6 +3,7 @@ package com.mobiledevelopment.cryptoyankee.ui;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -51,18 +52,25 @@ public class CandleChartActivity extends AppCompatActivity {
 
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime startWeek = currentTime.minusDays(7);
-        LocalDateTime startMonth = currentTime.minusDays(30);
+        LocalDateTime startMonth = currentTime.minusMonths(1);
+        Log.d("time_sweet_time", startWeek.toString() + "reza" + startMonth.toString());
 
         candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
 
         candlesDTO.setCoinName(currentCoinName);
         candlesDTO.setCoinSymbol(currentCoinSymbol);
 
+        Log.d("sepi", Integer.toString(candlesDTO.getMonthlyCandles().size()));
+        for (int i = 0; i < 27; i++){
+            Log.d("candle_debug", candlesDTO.getMonthlyCandles().get(i).toString());
+        }
+
         draw_chart(candlesDTO.getWeeklyCandles());
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
     }
 
     private void toggleCandles(View view) {
+        Log.d("yashi", "amin");
         weeklyCandlesOn = !weeklyCandlesOn;
         if (weeklyCandlesOn) {
             draw_chart(candlesDTO.getWeeklyCandles());

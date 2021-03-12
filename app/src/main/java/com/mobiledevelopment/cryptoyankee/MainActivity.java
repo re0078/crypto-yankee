@@ -80,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void runProcessWithLoading(Runnable runnable) {
         threadPoolService.execute(() -> {
-//            swipeRefreshLayout.setRefreshing(true);
+            swipeRefreshLayout.setRefreshing(true);
             runnable.run();
-//            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setRefreshing(false);
         });
     }
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
             if (coinsMap.size() <= maxCoinsCount) {
-                runProcessWithLoading(this::fetchCoins);
+                //runProcessWithLoading(this::fetchCoins);
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }
