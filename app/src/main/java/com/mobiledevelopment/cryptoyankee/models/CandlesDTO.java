@@ -1,5 +1,9 @@
 package com.mobiledevelopment.cryptoyankee.models;
 
+import android.content.res.Resources;
+
+import com.mobiledevelopment.cryptoyankee.R;
+
 import java.util.ArrayList;
 
 import lombok.AllArgsConstructor;

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -95,7 +96,7 @@ public class ApiService {
                 build();
     }
 
-    public CandlesDTO getCandleInfo() {
+    public CandlesDTO getCandleInfo(String symbol, LocalDateTime startWeek, LocalDateTime startMonth) {
 //        OkHttpClient client = new OkHttpClient();
 //
 //        Request request = new Request.Builder()

@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--> CoinMarketCap api values. Coins general information<!-->
     <string name="info_api">https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest</string>
-    <string name="chart_api">side_url</string>
-    <string name="api_key">X-CMC_PRO_API_KEY</string>
-    <string name="api_key_value">929d57a0-ed74-4022-9c10-d14f873f418c</string>
+    <string name="info_api_key">X-CMC_PRO_API_KEY</string>
+    <string name="info_api_key_value">929d57a0-ed74-4022-9c10-d14f873f418c</string>
     <string name="convert_key">convert</string>
     <string name="usd_val">USD</string>
     <string name="limit_key">limit</string>
     <integer name="fetch_limit">5</integer>
     <string name="start_key">start</string>
     <integer name="max_poll">20</integer>
+
+    <!--> CoinMarketCap api values. Coins general information<!-->
+    <string name="chart_api">side_url</string>
+    <string name="chart_api_key">X-CoinAPI-Key</string>
+    <string name="chart_api_key_value">7DA58282-197D-42AC-B096-AF5A99EEE083</string>
 </resources>

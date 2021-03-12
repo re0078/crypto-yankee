@@ -22,6 +22,7 @@ import com.mobiledevelopment.cryptoyankee.models.CandlesChartItems;
 import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
 import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -48,7 +49,12 @@ public class CandleChartActivity extends AppCompatActivity {
                     "Please Wait until Loading is Complete.", Toast.LENGTH_SHORT).show();
             load_candles();
         });
-        candlesDTO = apiService.getCandleInfo();
+        //TODO get past week/month localDateTime. For symbol check coinDTO/viewHolder
+        String symbol;
+        LocalDateTime startWeek;
+        LocalDateTime startMonth;
+
+        candlesDTO = apiService.getCandleInfo(symbol, startWeek, startMonth);
         draw_chart(candlesDTO.weeklyCandles);
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
     }
