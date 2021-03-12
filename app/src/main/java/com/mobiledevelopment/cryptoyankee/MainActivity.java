@@ -20,10 +20,10 @@ import com.mobiledevelopment.cryptoyankee.model.exception.ApiConnectivityExcepti
 import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private CoinRepository coinRepository;
     private CoinModelConverter coinModelConverter;
     private ApiService apiService;
-    private final SortedMap<Integer, CoinDTO> coinsMap = new TreeMap<>();
+    private final Map<Integer, CoinDTO> coinsMap = new HashMap<>();
     private Integer loadLimit;
     private Integer maxCoinsCount;
     private Integer nonCompletePage;
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         coinModelConverter = CoinModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
-        coinRepository.deleteCoins();
+//        coinRepository.deleteCoins();
         initAdapter();
     }
 
@@ -87,33 +87,48 @@ public class MainActivity extends AppCompatActivity {
         int from = offset.get();
         List<Coin> coins = coinRepository.getLimitedCoins(from);
         int to = offset.addAndGet(coins.size());
-        coins.forEach(coin -> coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin)));
-        adaptLoadedCoins(from, to);
+        coins.forEach(coin -> {
+            coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin));
+            coinAdapter.getCoinsMap().put(coin.getId(), coinModelConverter.getCoinDTO(coin));
+        });
+        adaptLoadedCoins();
     }
 
     private void fetchCoins() {
+        Log.d(LOG_TAG, "Before fetchCoin");
         try {
             for (int i = 0; i < maxCoinsCount / loadLimit + nonCompletePage; i++) {
-                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
-                coinDTOS.forEach(coinDTO -> coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO));
-                adaptLoadedCoins(i * loadLimit, (i + 1) * loadLimit);
+                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(i * loadLimit + 1);
+                Log.i(LOG_TAG, "size of coins: " + coinDTOS.size());
+                coinDTOS.forEach(coinDTO -> {
+                    coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                    coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                });
+                for (Integer id : coinsMap.keySet()) {
+                    Log.i(LOG_TAG, String.valueOf(id));
+                }
+                Log.i(LOG_TAG, "In fetchCoins");
+                adaptLoadedCoins();
             }
         } catch (ApiConnectivityException e) {
-            loadCoins();
+            Log.d(LOG_TAG, "HERE");
+//            loadCoins();
         }
     }
 
     private void loadCoins() {
         List<Coin> coins = coinRepository.getLimitedCoins(0);
-        coins.forEach(coin -> coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin)));
+        coins.forEach(coin -> {
+            coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin));
+            coinAdapter.getCoinsMap().put(coin.getId(), coinModelConverter.getCoinDTO(coin));
+        });
         int size = coins.size();
-        adaptLoadedCoins(0, size);
+        adaptLoadedCoins();
         offset.addAndGet(size);
         hasCachedData.set(size != 0);
     }
 
-    private void adaptLoadedCoins(int from, int to) {
-        coinAdapter.getCoinDTOS().addAll(coinsMap.subMap(from, to).values());
+    private void adaptLoadedCoins() {
         coinAdapter.notifyDataSetChanged();
     }
 
@@ -140,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
             if (coinsMap.size() <= maxCoinsCount) {
-                runProcessWithLoading(this::loadExtraCoins);
+//                runProcessWithLoading(this::fetchCoins);
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }
