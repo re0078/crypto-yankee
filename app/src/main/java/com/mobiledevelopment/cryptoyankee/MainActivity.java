@@ -135,9 +135,10 @@ public class MainActivity extends AppCompatActivity {
         coinAdapter.notifyDataSetChanged();
     }
 
-    public void showUTLCChart(String coinName) {
+    public void showUTLCChart(String coinName, String coinSymbol) {
         Intent intent = new Intent(MainActivity.this, CandleChartActivity.class);
         intent.putExtra(CandleChartActivity.COIN_NAME_KEY, coinName);
+        intent.putExtra(CandleChartActivity.COIN_SYMBOL_KEY, coinSymbol);
         startActivity(intent);
         Log.i(LOG_TAG, "UTLC Chart Activity Started");
     }

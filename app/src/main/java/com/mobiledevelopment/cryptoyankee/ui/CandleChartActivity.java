@@ -20,6 +20,7 @@ import com.mobiledevelopment.cryptoyankee.R;
 import com.mobiledevelopment.cryptoyankee.clients.ApiService;
 import com.mobiledevelopment.cryptoyankee.models.CandlesChartItems;
 import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,6 @@ import java.util.Objects;
 public class CandleChartActivity extends AppCompatActivity {
 
     private ThreadPoolService threadPoolService;
-    private ApiService apiService;
     private boolean weeklyCandlesOn = true;
     private CandlesDTO candlesDTO;
 
@@ -40,8 +40,9 @@ public class CandleChartActivity extends AppCompatActivity {
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
         threadPoolService = ThreadPoolService.getInstance();
-        apiService = ApiService.getInstance(Resources.getSystem());
+        ApiService apiService = ApiService.getInstance(Resources.getSystem());
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
+        String currentCoinSymbol = getIntent().getStringExtra(COIN_SYMBOL_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
         swipeRefreshLayout.post(this::load_candles);
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -49,12 +50,16 @@ public class CandleChartActivity extends AppCompatActivity {
                     "Please Wait until Loading is Complete.", Toast.LENGTH_SHORT).show();
             load_candles();
         });
-        //TODO get past week/month localDateTime. For symbol check coinDTO/viewHolder
-        String symbol;
-        LocalDateTime startWeek;
-        LocalDateTime startMonth;
 
-        candlesDTO = apiService.getCandleInfo(symbol, startWeek, startMonth);
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime startWeek = currentTime.minusDays(7);
+        LocalDateTime startMonth = currentTime.minusDays(30);
+
+        candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
+
+        candlesDTO.coinName = currentCoinName;
+        candlesDTO.coinSymbol = currentCoinSymbol;
+
         draw_chart(candlesDTO.weeklyCandles);
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
     }
@@ -79,15 +84,15 @@ public class CandleChartActivity extends AppCompatActivity {
         });
     }
 
-    private void draw_chart(ArrayList<CandlesChartItems> list) {
+    private void draw_chart(ArrayList<CandlesChartItems> candlesList) {
         ArrayList<CandleEntry> entries = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < candlesList.size(); i++) {
 
-            float high = list.get(i).priceHigh;
-            float low = list.get(i).priceLow;
+            float high = candlesList.get(i).priceHigh;
+            float low = candlesList.get(i).priceLow;
 
-            float open = list.get(i).priceOpen;
-            float close = list.get(i).priceClose;
+            float open = candlesList.get(i).priceOpen;
+            float close = candlesList.get(i).priceClose;
 
             entries.add(new CandleEntry(i + 1,
                     high,
@@ -118,4 +123,6 @@ public class CandleChartActivity extends AppCompatActivity {
     }
 
     public static final String COIN_NAME_KEY = "coin_name";
+
+    public static final String COIN_SYMBOL_KEY = "coin_symbol";
 }

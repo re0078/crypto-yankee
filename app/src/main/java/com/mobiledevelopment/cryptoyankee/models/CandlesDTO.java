@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CandlesDTO {
-    public String coinId;
+    public String coinSymbol;
     public String coinName;
     public ArrayList<CandlesChartItems> weeklyCandles;
     public ArrayList<CandlesChartItems> monthlyCandles;

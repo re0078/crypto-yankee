@@ -70,7 +70,8 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
                 inflate(R.layout.coin_layout, parent, false);
         view.setOnClickListener(v -> (
                 (MainActivity) activity).showUTLCChart(
-                ((TextView) view.findViewById(R.id.coin_name)).getText().toString()
+                ((TextView) view.findViewById(R.id.coin_name)).getText().toString(),
+                ((TextView) view.findViewById(R.id.coin_symbol)).getText().toString()
         ));
         return new CoinViewHolder(view);
     }
