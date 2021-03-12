@@ -1,4 +1,4 @@
-package com.mobiledevelopment.cryptoyankee.communication;
+package com.mobiledevelopment.cryptoyankee.clients;
 
 
 import android.content.res.Resources;
@@ -7,10 +7,10 @@ import android.util.Log;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
-import com.mobiledevelopment.cryptoyankee.model.coin.ServerInfoResponse;
-import com.mobiledevelopment.cryptoyankee.model.exception.ApiConnectivityException;
-import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
+import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.models.coin.ServerInfoResponse;
+import com.mobiledevelopment.cryptoyankee.models.exception.ApiConnectivityException;
+import com.mobiledevelopment.cryptoyankee.services.CoinModelConverter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

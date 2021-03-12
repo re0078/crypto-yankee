@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
-import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
+import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.ui.CoinViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
