@@ -7,6 +7,7 @@ import android.util.Log;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobiledevelopment.cryptoyankee.R;
+import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.ServerInfoResponse;
 import com.mobiledevelopment.cryptoyankee.models.exception.ApiConnectivityException;
@@ -90,7 +91,19 @@ public class ApiService {
                 addQueryParameter(resources.getString(R.string.start_key), String.valueOf(offset));
         return new Request.Builder().
                 url(urlBuilder.build().toString()).
-                addHeader(resources.getString(R.string.api_key), resources.getString(R.string.api_key_value)).
+                addHeader(resources.getString(R.string.info_api_key), resources.getString(R.string.info_api_key_value)).
                 build();
+    }
+
+    public CandlesDTO getCandleInfo() {
+//        OkHttpClient client = new OkHttpClient();
+//
+//        Request request = new Request.Builder()
+//                .url("https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/history?period_id=1MIN&time_start=2016-01-01T00:00:00")
+//                .post(body)
+//                .addHeader("X-CoinAPI-Key", "73034021-THIS-IS-SAMPLE-KEYs")
+//                .build();
+//
+//        Response response = client.newCall(request).execute();
     }
 }

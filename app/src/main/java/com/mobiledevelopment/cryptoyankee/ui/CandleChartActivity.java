@@ -1,5 +1,6 @@
 package com.mobiledevelopment.cryptoyankee.ui;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.mobiledevelopment.cryptoyankee.R;
+import com.mobiledevelopment.cryptoyankee.clients.ApiService;
 import com.mobiledevelopment.cryptoyankee.models.CandlesChartItems;
 import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
 import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
@@ -27,6 +29,7 @@ import java.util.Objects;
 public class CandleChartActivity extends AppCompatActivity {
 
     private ThreadPoolService threadPoolService;
+    private ApiService apiService;
     private boolean weeklyCandlesOn = true;
     private CandlesDTO candlesDTO;
 
@@ -36,6 +39,7 @@ public class CandleChartActivity extends AppCompatActivity {
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
         threadPoolService = ThreadPoolService.getInstance();
+        apiService = ApiService.getInstance(Resources.getSystem());
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
         swipeRefreshLayout.post(this::load_candles);
@@ -44,6 +48,7 @@ public class CandleChartActivity extends AppCompatActivity {
                     "Please Wait until Loading is Complete.", Toast.LENGTH_SHORT).show();
             load_candles();
         });
+        candlesDTO = apiService.getCandleInfo();
         draw_chart(candlesDTO.weeklyCandles);
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
     }
