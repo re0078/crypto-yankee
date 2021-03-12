@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.mobiledevelopment.cryptoyankee.adapter.RezaCoinAdapter;
+import com.mobiledevelopment.cryptoyankee.adapter.CoinAdapter;
 import com.mobiledevelopment.cryptoyankee.communication.ApiService;
 import com.mobiledevelopment.cryptoyankee.db.dao.CoinRepository;
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
@@ -21,13 +21,12 @@ import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends AppCompatActivity {
-    private RezaCoinAdapter coinAdapter;
+    private CoinAdapter coinAdapter;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoinRepository coinRepository;
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Chq", "Main");
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(this::initializeCoins);
+        runProcessWithLoading(this::loadTenCoins);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             runProcessWithLoading(this::reloadTenCoins);
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        storeCoins();
+        storeCoins(coinsDTOs);
     }
 
     private void setupBeans() {
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         coinRepository.putCoins(coins);
         recyclerView = findViewById(R.id.coinList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        coinAdapter = new RezaCoinAdapter(recyclerView, this);
+        coinAdapter = new CoinAdapter(recyclerView, this);
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
             if (coinsDTOs.size() <= TOTAL_PAGE_COINS) {
@@ -94,10 +93,6 @@ public class MainActivity extends AppCompatActivity {
     public void loadExtraCoins() {
         List<Coin> coins = coinRepository.getTenCoins(offset.get());
         offset.addAndGet(coins.size());
-
-//        List<Coin> coins = new ArrayList<>();
-//        coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
-
         List<CoinDTO> coinDTOS = new ArrayList<>();
         coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
 
@@ -107,33 +102,24 @@ public class MainActivity extends AppCompatActivity {
     private void reloadTenCoins() {
         try {
             List<CoinDTO> coinDTOS = apiService.getCoinsInfo(1);
-            coinAdapter.setCoinDTOS(coinDTOS);
-            coinAdapter.notifyDataSetChanged();
+            adaptLoadedCoins(coinDTOS);
             storeCoins(coinDTOS);
         } catch (ApiConnectivityException e) {
             loadTenCoins();
         }
-
-//        List<Coin> coins = new ArrayList<>();
-//        coins.add(new Coin(1, "bitcoin2", 2000, 46, 788, 1000));
-
-        adaptLoadedCoins(coins);
     }
 
-    private void initializeCoins() {
+    private void loadTenCoins() {
         List<Coin> coins = coinRepository.getTenCoins(0);
         offset.set(coins.size());
-
-//        List<Coin> coins = new ArrayList<>();
-//        coins.add(new Coin(1, "bitcoin", 2000, 46, 788, 1000));
-
-        adaptLoadedCoins(coins);
-    }
-
-    private void adaptLoadedCoins(List<Coin> coins) {
         List<CoinDTO> coinDTOS = new ArrayList<>();
         coins.forEach(coin -> coinDTOS.add(coinModelConverter.getCoinDTO(coin)));
-        coinAdapter.setCoinDTOS(coinDTOS);
+
+        adaptLoadedCoins(coinDTOS);
+    }
+
+    private void adaptLoadedCoins(List<CoinDTO> coins) {
+        coinAdapter.setCoinDTOS(coins);
         coinAdapter.notifyDataSetChanged();
     }
 

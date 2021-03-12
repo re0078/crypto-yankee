@@ -24,9 +24,8 @@ import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-@RequiredArgsConstructor
-public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
-    @NonNull
+public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
+
     private Activity activity;
     @Setter
     private List<CoinDTO> coinDTOS;
@@ -34,8 +33,10 @@ public class RezaCoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     private boolean isLoading;
     private final int VISIBLE_THRESHOLD = 5;
 
-    public void initialize(RecyclerView recyclerView) {
-        coinDTOS = new ArrayList<>();
+    public CoinAdapter(RecyclerView recyclerView, Activity activity) {
+        this.coinDTOS = new ArrayList<>();
+        this.activity = activity;
+
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
