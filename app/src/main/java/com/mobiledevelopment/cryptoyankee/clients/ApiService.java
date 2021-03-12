@@ -103,7 +103,7 @@ public class ApiService {
         Request request = buildFetchCandlesInfoRequest(symbol, startWeek);
         candlesDTO.setWeeklyCandles(callCandlesInfoApi(request));
         request = buildFetchCandlesInfoRequest(symbol, startMonth);
-        candlesDTO.setWeeklyCandles(callCandlesInfoApi(request));
+        candlesDTO.setMonthlyCandles(callCandlesInfoApi(request));
         return candlesDTO;
     }
 

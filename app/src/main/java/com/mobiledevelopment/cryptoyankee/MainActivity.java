@@ -80,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void runProcessWithLoading(Runnable runnable) {
         threadPoolService.execute(() -> {
-            swipeRefreshLayout.setRefreshing(true);
+//            swipeRefreshLayout.setRefreshing(true);
             runnable.run();
-            swipeRefreshLayout.setRefreshing(false);
+//            swipeRefreshLayout.setRefreshing(false);
         });
     }
 
@@ -99,11 +99,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchCoins() {
         runOnUiThread(() -> {
-            Log.d(LOG_TAG, "Before fetchCoin");
             try {
-                for (int i = 0; i < maxCoinsCount / loadLimit + nonCompletePage; i++) {
+                for (int i = 0; i < 1; i++) {
                     List<CoinDTO> coinDTOS = apiService.getCoinsInfo(i * loadLimit + 1);
-                    Log.i(LOG_TAG, "size of coins: " + coinDTOS.size());
                     coinDTOS.forEach(coinDTO -> {
                         coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
                         coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
@@ -111,11 +109,10 @@ public class MainActivity extends AppCompatActivity {
                     for (Integer id : coinsMap.keySet()) {
                         Log.i(LOG_TAG, String.valueOf(id));
                     }
-                    Log.i(LOG_TAG, "In fetchCoins");
                     adaptLoadedCoins();
                 }
+                Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
             } catch (ApiConnectivityException e) {
-                Log.d(LOG_TAG, "HERE");
 //            loadCoins();
             }
         });
@@ -161,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
             if (coinsMap.size() <= maxCoinsCount) {
-//                runProcessWithLoading(this::fetchCoins);
+                runProcessWithLoading(this::fetchCoins);
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }

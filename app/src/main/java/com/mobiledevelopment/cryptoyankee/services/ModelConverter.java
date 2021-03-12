@@ -53,8 +53,8 @@ public class ModelConverter {
     public CandlesChartItems getChartItem(ServerCandleDTO serverCandleDTO) {
         return new CandlesChartItems(
                 (float) serverCandleDTO.getOpen(),
-                (float) serverCandleDTO.getOpen(),
-                (float) serverCandleDTO.getOpen(),
-                (float) serverCandleDTO.getOpen());
+                (float) serverCandleDTO.getClose(),
+                (float) serverCandleDTO.getHigh(),
+                (float) serverCandleDTO.getLow());
     }
 }
