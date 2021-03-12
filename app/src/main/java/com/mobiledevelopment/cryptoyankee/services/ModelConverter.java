@@ -1,6 +1,8 @@
 package com.mobiledevelopment.cryptoyankee.services;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
+import com.mobiledevelopment.cryptoyankee.models.candle.CandlesChartItems;
+import com.mobiledevelopment.cryptoyankee.models.candle.ServerCandleDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.ServerCoinDTO;
 
@@ -8,11 +10,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CoinModelConverter {
-    private static final CoinModelConverter COIN_MODEL_CONVERTER = new CoinModelConverter();
+public class ModelConverter {
+    private static final ModelConverter MODEL_CONVERTER = new ModelConverter();
 
-    public static CoinModelConverter getInstance() {
-        return COIN_MODEL_CONVERTER;
+    public static ModelConverter getInstance() {
+        return MODEL_CONVERTER;
     }
 
     public Coin getCoinEntity(CoinDTO coinDTO) {
@@ -46,5 +48,13 @@ public class CoinModelConverter {
                 String.valueOf(serverCoinDTO.getQuote().getUsd().getHChange()),
                 String.valueOf(serverCoinDTO.getQuote().getUsd().getDChange()),
                 String.valueOf(serverCoinDTO.getQuote().getUsd().getWChange()));
+    }
+
+    public CandlesChartItems getChartItem(ServerCandleDTO serverCandleDTO) {
+        return new CandlesChartItems(
+                (float) serverCandleDTO.getOpen(),
+                (float) serverCandleDTO.getOpen(),
+                (float) serverCandleDTO.getOpen(),
+                (float) serverCandleDTO.getOpen());
     }
 }
