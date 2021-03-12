@@ -1,6 +1,4 @@
-package com.mobiledevelopment.cryptoyankee.model;
-
-import java.util.Date;
+package com.mobiledevelopment.cryptoyankee.models;
 
 import lombok.Data;
 

@@ -1,17 +1,13 @@
 package com.mobiledevelopment.cryptoyankee.communication;
 
-import android.content.res.Resources;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mobiledevelopment.cryptoyankee.model.coin.ServerCoinDTO;
-import com.mobiledevelopment.cryptoyankee.model.coin.ServerInfoResponse;
+import com.mobiledevelopment.cryptoyankee.models.coin.ServerInfoResponse;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

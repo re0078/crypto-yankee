@@ -1,9 +1,8 @@
-package com.mobiledevelopment.cryptoyankee.model.coin;
+package com.mobiledevelopment.cryptoyankee.models.coin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor

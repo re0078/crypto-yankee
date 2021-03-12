@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -17,8 +16,9 @@ import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.model.CandlesChartItems;
-import com.mobiledevelopment.cryptoyankee.model.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.models.CandlesChartItems;
+import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -26,6 +26,7 @@ import java.util.Objects;
 
 public class CandleChartActivity extends AppCompatActivity {
 
+    private ThreadPoolService threadPoolService;
     private boolean weeklyCandlesOn = true;
     private CandlesDTO candlesDTO;
 
@@ -34,6 +35,7 @@ public class CandleChartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
+        threadPoolService = ThreadPoolService.getInstance();
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
         swipeRefreshLayout.post(this::load_candles);
@@ -56,7 +58,7 @@ public class CandleChartActivity extends AppCompatActivity {
     }
 
     private void load_candles() {
-        runOnUiThread(() -> {
+        threadPoolService.execute(() -> {
             // initialize candles (both weekly and monthly) from candles service TODO
             candlesDTO = new CandlesDTO("1", "bitcoin",
                     new ArrayList<>(),

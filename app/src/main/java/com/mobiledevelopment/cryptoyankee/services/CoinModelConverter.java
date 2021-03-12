@@ -1,8 +1,8 @@
-package com.mobiledevelopment.cryptoyankee.util;
+package com.mobiledevelopment.cryptoyankee.services;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
-import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
-import com.mobiledevelopment.cryptoyankee.model.coin.ServerCoinDTO;
+import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.models.coin.ServerCoinDTO;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

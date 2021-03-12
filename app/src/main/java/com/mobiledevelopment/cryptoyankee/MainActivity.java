@@ -11,13 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.mobiledevelopment.cryptoyankee.adapter.CoinAdapter;
-import com.mobiledevelopment.cryptoyankee.communication.ApiService;
+import com.mobiledevelopment.cryptoyankee.clients.ApiService;
 import com.mobiledevelopment.cryptoyankee.db.dao.CoinRepository;
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
+import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 import com.mobiledevelopment.cryptoyankee.ui.CandleChartActivity;
-import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
-import com.mobiledevelopment.cryptoyankee.model.exception.ApiConnectivityException;
-import com.mobiledevelopment.cryptoyankee.util.CoinModelConverter;
+import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.models.exception.ApiConnectivityException;
+import com.mobiledevelopment.cryptoyankee.services.CoinModelConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private CoinRepository coinRepository;
     private CoinModelConverter coinModelConverter;
     private ApiService apiService;
+    private ThreadPoolService threadPoolService;
     private final Map<Integer, CoinDTO> coinsMap = new HashMap<>();
     private Integer loadLimit;
     private Integer maxCoinsCount;
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         maxCoinsCount = getResources().getInteger(R.integer.max_poll);
         nonCompletePage = (maxCoinsCount % loadLimit) == 0 ? 0 : 1;
         apiService = ApiService.getInstance(getResources());
+        threadPoolService = ThreadPoolService.getInstance();
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         coinModelConverter = CoinModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
@@ -76,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runProcessWithLoading(Runnable runnable) {
-        runOnUiThread(() -> {
+        threadPoolService.execute(() -> {
             swipeRefreshLayout.setRefreshing(true);
             runnable.run();
             swipeRefreshLayout.setRefreshing(false);

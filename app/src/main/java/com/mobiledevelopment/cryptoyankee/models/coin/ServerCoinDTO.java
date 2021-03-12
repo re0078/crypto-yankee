@@ -1,7 +1,6 @@
-package com.mobiledevelopment.cryptoyankee.model.coin;
+package com.mobiledevelopment.cryptoyankee.models.coin;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
