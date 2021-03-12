@@ -1,6 +1,5 @@
 package com.mobiledevelopment.cryptoyankee.ui;
 
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -18,9 +17,8 @@ import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.mobiledevelopment.cryptoyankee.R;
 import com.mobiledevelopment.cryptoyankee.clients.ApiService;
-import com.mobiledevelopment.cryptoyankee.models.CandlesChartItems;
-import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
-import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
+import com.mobiledevelopment.cryptoyankee.models.candle.CandlesChartItems;
+import com.mobiledevelopment.cryptoyankee.models.candle.CandlesDTO;
 import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 
 import java.time.LocalDateTime;
@@ -40,7 +38,7 @@ public class CandleChartActivity extends AppCompatActivity {
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
         threadPoolService = ThreadPoolService.getInstance();
-        ApiService apiService = ApiService.getInstance(Resources.getSystem());
+        ApiService apiService = ApiService.getInstance();
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         String currentCoinSymbol = getIntent().getStringExtra(COIN_SYMBOL_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
@@ -57,19 +55,19 @@ public class CandleChartActivity extends AppCompatActivity {
 
         candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
 
-        candlesDTO.coinName = currentCoinName;
-        candlesDTO.coinSymbol = currentCoinSymbol;
+        candlesDTO.setCoinName(currentCoinName);
+        candlesDTO.setCoinSymbol(currentCoinSymbol);
 
-        draw_chart(candlesDTO.weeklyCandles);
+        draw_chart(candlesDTO.getWeeklyCandles());
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
     }
 
     private void toggleCandles(View view) {
         weeklyCandlesOn = !weeklyCandlesOn;
         if (weeklyCandlesOn) {
-            draw_chart(candlesDTO.weeklyCandles);
+            draw_chart(candlesDTO.getWeeklyCandles());
         } else {
-            draw_chart(candlesDTO.monthlyCandles);
+            draw_chart(candlesDTO.getMonthlyCandles());
         }
     }
 
@@ -103,9 +101,9 @@ public class CandleChartActivity extends AppCompatActivity {
         }
         String dataSetTag;
         if (weeklyCandlesOn) {
-            dataSetTag = candlesDTO.coinName + "weekly";
+            dataSetTag = candlesDTO.getCoinName() + "weekly";
         } else {
-            dataSetTag = candlesDTO.coinName + "monthly";
+            dataSetTag = candlesDTO.getCoinName() + "monthly";
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, dataSetTag);
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
