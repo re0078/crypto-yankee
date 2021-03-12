@@ -98,25 +98,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchCoins() {
-        Log.d(LOG_TAG, "Before fetchCoin");
-        try {
-            for (int i = 0; i < maxCoinsCount / loadLimit + nonCompletePage; i++) {
-                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(i * loadLimit + 1);
-                Log.i(LOG_TAG, "size of coins: " + coinDTOS.size());
-                coinDTOS.forEach(coinDTO -> {
-                    coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                    coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                });
-                for (Integer id : coinsMap.keySet()) {
-                    Log.i(LOG_TAG, String.valueOf(id));
+        runOnUiThread(() -> {
+            Log.d(LOG_TAG, "Before fetchCoin");
+            try {
+                for (int i = 0; i < maxCoinsCount / loadLimit + nonCompletePage; i++) {
+                    List<CoinDTO> coinDTOS = apiService.getCoinsInfo(i * loadLimit + 1);
+                    Log.i(LOG_TAG, "size of coins: " + coinDTOS.size());
+                    coinDTOS.forEach(coinDTO -> {
+                        coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                        coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                    });
+                    for (Integer id : coinsMap.keySet()) {
+                        Log.i(LOG_TAG, String.valueOf(id));
+                    }
+                    Log.i(LOG_TAG, "In fetchCoins");
+                    adaptLoadedCoins();
                 }
-                Log.i(LOG_TAG, "In fetchCoins");
-                adaptLoadedCoins();
-            }
-        } catch (ApiConnectivityException e) {
-            Log.d(LOG_TAG, "HERE");
+            } catch (ApiConnectivityException e) {
+                Log.d(LOG_TAG, "HERE");
 //            loadCoins();
-        }
+            }
+        });
     }
 
     private void loadCoins() {
