@@ -19,6 +19,7 @@ public class CoinModelConverter {
         Coin coin = new Coin();
         coin.setId(Integer.parseInt(coinDTO.id));
         coin.setName(coinDTO.name);
+        coin.setSymbol(coinDTO.symbol);
         coin.setPriceUsd(Double.parseDouble(coinDTO.priceUsd));
         coin.setHChangePercentage(Double.parseDouble(coinDTO.percentChange1H));
         coin.setDChangePercentage(Double.parseDouble(coinDTO.percentChange24H));
@@ -30,6 +31,7 @@ public class CoinModelConverter {
         CoinDTO coinDTO = new CoinDTO();
         coinDTO.setId(Integer.toString(coin.getId()));
         coinDTO.setName(coin.getName());
+        coinDTO.setSymbol(coin.getSymbol());
         coinDTO.setPriceUsd(Double.toString(coin.getPriceUsd()));
         coinDTO.setPercentChange1H(Double.toString(coin.getHChangePercentage()));
         coinDTO.setPercentChange24H(Double.toString(coin.getDChangePercentage()));

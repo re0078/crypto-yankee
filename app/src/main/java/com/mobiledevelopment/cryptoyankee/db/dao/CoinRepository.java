@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 
@@ -31,7 +32,7 @@ public class CoinRepository {
 
     public List<Coin> getLimitedCoins(int offset) {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
-        String[] columns = {_ID, CURR_NAME, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
+        String[] columns = {COIN_ID, CURR_NAME, CURR_SYMBOL, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
                 null, null, null, offset + "," + maxRecords);
         List<Coin> coins = new ArrayList<>();
@@ -44,8 +45,9 @@ public class CoinRepository {
 
     private Coin readCoin(Cursor cursor) {
         Coin coin = new Coin();
-        coin.setId(cursor.getInt(cursor.getColumnIndexOrThrow(_ID)));
+        coin.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COIN_ID)));
         coin.setName(cursor.getString(cursor.getColumnIndexOrThrow(CURR_NAME)));
+        coin.setSymbol(cursor.getString(cursor.getColumnIndexOrThrow(CURR_SYMBOL)));
         coin.setPriceUsd(cursor.getDouble(cursor.getColumnIndexOrThrow(PRICE_USD)));
         coin.setHChangePercentage(cursor.getDouble(cursor.getColumnIndexOrThrow(H_CHANGE_PERCENT)));
         coin.setDChangePercentage(cursor.getDouble(cursor.getColumnIndexOrThrow(D_CHANGE_PERCENT)));
@@ -55,13 +57,13 @@ public class CoinRepository {
 
     public void putCoins(List<Coin> coins) {
         SQLiteDatabase db = coinDBHelper.getWritableDatabase();
-        coins.forEach(coin -> coin.setId((int) db.insert(TABLE_NAME, null, setCoinValues(coin))));
+        coins.forEach(coin -> db.insert(TABLE_NAME, null, setCoinValues(coin)));
     }
 
     public void updateCoins(List<Coin> coins) {
         SQLiteDatabase db = coinDBHelper.getWritableDatabase();
         coins.forEach(coin -> {
-            String selection = _ID + " = ";
+            String selection = COIN_ID + " = ";
             String[] selectionArgs = {Integer.toString(coin.getId())};
             db.update(TABLE_NAME, setCoinValues(coin), selection, selectionArgs);
         });
@@ -74,7 +76,9 @@ public class CoinRepository {
 
     private ContentValues setCoinValues(Coin coin) {
         ContentValues values = new ContentValues();
+        values.put(COIN_ID, coin.getId());
         values.put(CURR_NAME, coin.getName());
+        values.put(CURR_SYMBOL, coin.getSymbol());
         values.put(PRICE_USD, coin.getPriceUsd());
         values.put(H_CHANGE_PERCENT, coin.getHChangePercentage());
         values.put(D_CHANGE_PERCENT, coin.getDChangePercentage());

@@ -19,25 +19,25 @@ import com.mobiledevelopment.cryptoyankee.model.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.viewHolder.CoinViewHolder;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
     private final Activity activity;
     @Getter
-    private final List<CoinDTO> coinDTOS;
+    private final Map<Integer, CoinDTO> coinsMap;
     @Setter
     private Loadable loadable;
     private boolean isLoading;
 
     public CoinAdapter(RecyclerView recyclerView, Activity activity, int loadLimit) {
-        this.coinDTOS = new ArrayList<>();
+        this.coinsMap = new HashMap<>();
         this.activity = activity;
         AtomicInteger visibleThreshold = new AtomicInteger(5);
         if (loadLimit != 0)
@@ -48,13 +48,15 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                assert linearLayoutManager != null;
-                int totalItemCount = linearLayoutManager.getItemCount();
-                int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
-                    if (loadable != null)
-                        loadable.onLoadMore();
-                    isLoading = true;
+                if (dy > 0) {
+                    assert linearLayoutManager != null;
+                    int totalItemCount = linearLayoutManager.getItemCount();
+                    int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
+                        if (loadable != null)
+                            loadable.onLoadMore();
+                        isLoading = true;
+                    }
                 }
             }
         });
@@ -75,7 +77,7 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CoinViewHolder holder, int position) {
-        CoinDTO item = coinDTOS.get(position);
+        CoinDTO item = new ArrayList<>(coinsMap.values()).get(position);
 
         float usd = Float.parseFloat(item.priceUsd) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
@@ -110,9 +112,9 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
     @Override
     public int getItemCount() {
-        if (coinDTOS.isEmpty())
+        if (coinsMap.isEmpty())
             Toast.makeText(activity, "There is no cached data. " +
                     "Please swipe down to fetch online data from server", Toast.LENGTH_LONG).show();
-        return coinDTOS.size();
+        return coinsMap.size();
     }
 }

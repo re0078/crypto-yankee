@@ -11,6 +11,7 @@ import lombok.ToString;
 public class Coin {
     private Integer id;
     private String name;
+    private String symbol;
     private Double priceUsd;
     private Double hChangePercentage;
     private Double dChangePercentage;
