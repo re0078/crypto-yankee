@@ -2,12 +2,17 @@ package com.mobiledevelopment.cryptoyankee.communication;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mobiledevelopment.cryptoyankee.models.candle.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.models.candle.ServerCandleDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.ServerInfoResponse;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -81,5 +86,46 @@ public class ApiServiceTests {
         ServerInfoResponse serverInfoResponse = objectMapper.reader().readValue(sampleResponseJson,
                 ServerInfoResponse.class);
         assertEquals(1, serverInfoResponse.getServerCoinDTOS().size());
+    }
+
+    @Test
+    public void bitcoinToUsdHistoryTest() throws IOException {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime lastWeek = localDateTime.minusDays(7);
+        LocalDateTime lastMonth = localDateTime.minusDays(30);
+/*
+        ServerCandleResponse serverCandleResponse = new ServerCandleResponse(Collections.
+                singletonList(new ServerCandleDTO(12.5, 11.5, 2.5, 3.5)));
+        String testJson = objectMapper.writer().writeValueAsString(serverCandleResponse);
+*/
+        String responseJson = "[\n" +
+                "  {\n" +
+                "    \"time_period_start\": \"2021-03-11T00:00:00.0000000Z\",\n" +
+                "    \"time_period_end\": \"2021-03-12T00:00:00.0000000Z\",\n" +
+                "    \"time_open\": \"2021-03-11T00:00:00.1301980Z\",\n" +
+                "    \"time_close\": \"2021-03-11T23:59:59.8707800Z\",\n" +
+                "    \"price_open\": 55888.700000000,\n" +
+                "    \"price_high\": 58155.990000000,\n" +
+                "    \"price_low\": 54269.000000000,\n" +
+                "    \"price_close\": 57815.470000000,\n" +
+                "    \"volume_traded\": 38825.238755128,\n" +
+                "    \"trades_count\": 539774\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"time_period_start\": \"2021-03-12T00:00:00.0000000Z\",\n" +
+                "    \"time_period_end\": \"2021-03-13T00:00:00.0000000Z\",\n" +
+                "    \"time_open\": \"2021-03-12T00:00:00.0010000Z\",\n" +
+                "    \"time_close\": \"2021-03-12T15:57:30.9470000Z\",\n" +
+                "    \"price_open\": 57807.000000000,\n" +
+                "    \"price_high\": 58098.500000000,\n" +
+                "    \"price_low\": 55011.000000000,\n" +
+                "    \"price_close\": 56942.620000000,\n" +
+                "    \"volume_traded\": 22633.450141314,\n" +
+                "    \"trades_count\": 348191\n" +
+                "  }\n" +
+                "]";
+        List<ServerCandleDTO> candlesDTOS = Arrays.asList(objectMapper.reader().readValue(responseJson, ServerCandleDTO[].class));
+
+        assertEquals(2, candlesDTOS.size());
     }
 }

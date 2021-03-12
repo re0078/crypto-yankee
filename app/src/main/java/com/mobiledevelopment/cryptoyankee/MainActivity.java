@@ -18,7 +18,7 @@ import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 import com.mobiledevelopment.cryptoyankee.ui.CandleChartActivity;
 import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.models.exception.ApiConnectivityException;
-import com.mobiledevelopment.cryptoyankee.services.CoinModelConverter;
+import com.mobiledevelopment.cryptoyankee.services.ModelConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoinRepository coinRepository;
-    private CoinModelConverter coinModelConverter;
+    private ModelConverter modelConverter;
     private ApiService apiService;
     private ThreadPoolService threadPoolService;
     private final Map<Integer, CoinDTO> coinsMap = new HashMap<>();
@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity {
         loadLimit = getResources().getInteger(R.integer.fetch_limit);
         maxCoinsCount = getResources().getInteger(R.integer.max_poll);
         nonCompletePage = (maxCoinsCount % loadLimit) == 0 ? 0 : 1;
-        apiService = ApiService.getInstance(getResources());
+        apiService = ApiService.getInstance();
         threadPoolService = ThreadPoolService.getInstance();
         swipeRefreshLayout = findViewById(R.id.rootLayout);
-        coinModelConverter = CoinModelConverter.getInstance();
+        modelConverter = ModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
 //        coinRepository.deleteCoins();
         initAdapter();
@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
         List<Coin> coins = coinRepository.getLimitedCoins(from);
         int to = offset.addAndGet(coins.size());
         coins.forEach(coin -> {
-            coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin));
-            coinAdapter.getCoinsMap().put(coin.getId(), coinModelConverter.getCoinDTO(coin));
+            coinsMap.put(coin.getId(), modelConverter.getCoinDTO(coin));
+            coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
         });
         adaptLoadedCoins();
     }
@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
     private void loadCoins() {
         List<Coin> coins = coinRepository.getLimitedCoins(0);
         coins.forEach(coin -> {
-            coinsMap.put(coin.getId(), coinModelConverter.getCoinDTO(coin));
-            coinAdapter.getCoinsMap().put(coin.getId(), coinModelConverter.getCoinDTO(coin));
+            coinsMap.put(coin.getId(), modelConverter.getCoinDTO(coin));
+            coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
         });
         int size = coins.size();
         adaptLoadedCoins();
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void storeCoins(boolean isUpdate) {
         List<Coin> coins = new ArrayList<>();
-        coinsMap.forEach((id, coinDTO) -> coins.add(coinModelConverter.getCoinEntity(coinDTO)));
+        coinsMap.forEach((id, coinDTO) -> coins.add(modelConverter.getCoinEntity(coinDTO)));
         if (isUpdate)
             coinRepository.updateCoins(coins);
         else
