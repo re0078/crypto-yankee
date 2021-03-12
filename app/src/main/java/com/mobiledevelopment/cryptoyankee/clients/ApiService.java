@@ -7,11 +7,13 @@ import android.util.Log;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobiledevelopment.cryptoyankee.R;
-import com.mobiledevelopment.cryptoyankee.models.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.models.candle.CandlesChartItems;
+import com.mobiledevelopment.cryptoyankee.models.candle.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.models.candle.ServerCandleDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.models.coin.ServerInfoResponse;
 import com.mobiledevelopment.cryptoyankee.models.exception.ApiConnectivityException;
-import com.mobiledevelopment.cryptoyankee.services.CoinModelConverter;
+import com.mobiledevelopment.cryptoyankee.services.ModelConverter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,10 +40,10 @@ public class ApiService {
     private OkHttpClient client;
     private Resources resources;
     private ObjectMapper objectMapper;
-    private CoinModelConverter converter;
+    private ModelConverter converter;
 
-    public static ApiService getInstance(Resources resources) {
-        API_UTIL.resources = resources;
+    public static ApiService getInstance() {
+        API_UTIL.resources = Resources.getSystem();
         API_UTIL.client = new OkHttpClient();
         API_UTIL.objectMapper = new ObjectMapper();
         API_UTIL.objectMapper.setVisibility(API_UTIL.objectMapper.getSerializationConfig().
@@ -50,7 +52,7 @@ public class ApiService {
                 .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
                 .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
                 .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
-        API_UTIL.converter = CoinModelConverter.getInstance();
+        API_UTIL.converter = ModelConverter.getInstance();
         return API_UTIL;
     }
 
@@ -61,7 +63,7 @@ public class ApiService {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.wtf("Api", "onFailure: ", e);
+                Log.wtf("Api", "getCoinsInfo->onFailure: ", e);
                 lockCompletableFuture.complete(null);
                 throw new ApiConnectivityException();
             }
@@ -74,7 +76,7 @@ public class ApiService {
                                     ServerInfoResponse.class);
                     serverInfoResponse.getServerCoinDTOS().forEach(serverCoinDTO -> coinDTOS.add(converter.getCoinDTO(serverCoinDTO)));
                 } else {
-                    Log.e("Api", "onResponse code: " + response.code());
+                    Log.e("Api", "getCoinsInfo->onResponse code: " + response.code());
                     throw new ApiConnectivityException();
                 }
                 lockCompletableFuture.complete(null);
@@ -97,14 +99,55 @@ public class ApiService {
     }
 
     public CandlesDTO getCandleInfo(String symbol, LocalDateTime startWeek, LocalDateTime startMonth) {
-//        OkHttpClient client = new OkHttpClient();
-//
-//        Request request = new Request.Builder()
-//                .url("https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/history?period_id=1MIN&time_start=2016-01-01T00:00:00")
-//                .post(body)
-//                .addHeader("X-CoinAPI-Key", "73034021-THIS-IS-SAMPLE-KEYs")
-//                .build();
-//
-//        Response response = client.newCall(request).execute();
+        CandlesDTO candlesDTO = new CandlesDTO();
+        Request request = buildFetchCandlesInfoRequest(symbol, startWeek);
+        candlesDTO.setWeeklyCandles(callCandlesInfoApi(request));
+        request = buildFetchCandlesInfoRequest(symbol, startMonth);
+        candlesDTO.setWeeklyCandles(callCandlesInfoApi(request));
+        return candlesDTO;
+    }
+
+    private ArrayList<CandlesChartItems> callCandlesInfoApi(Request request) {
+        CompletableFuture<Void> lockCompletableFuture = new CompletableFuture<>();
+        ArrayList<CandlesChartItems> items = new ArrayList<>();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.wtf("Api", "callCandlesInfoApi->onFailure: ", e);
+                lockCompletableFuture.complete(null);
+                throw new ApiConnectivityException();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() == HttpURLConnection.HTTP_OK) {
+                    ServerCandleDTO[] responseItems = objectMapper.reader().
+                            readValue(Objects.requireNonNull(response.body()).string(),
+                                    ServerCandleDTO[].class);
+                    for (ServerCandleDTO serverCandleDTO : responseItems) {
+                        items.add(converter.getChartItem(serverCandleDTO));
+                    }
+                } else {
+                    Log.e("Api", "callCandlesInfoApi->onResponse code: " + response.code());
+                    throw new ApiConnectivityException();
+                }
+                lockCompletableFuture.complete(null);
+            }
+        });
+        lockCompletableFuture.join();
+        return items;
+    }
+
+    private Request buildFetchCandlesInfoRequest(String symbol, LocalDateTime startTime) {
+        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(resources.getString(R.string.candle_api).
+                concat(symbol).concat(resources.getString(R.string.usd_history_uri)))).
+                newBuilder().
+                addQueryParameter(resources.getString(R.string.period_key), resources.getString(R.string.period_val)).
+                addQueryParameter(resources.getString(R.string.time_start_key), startTime.toString());
+        return new Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .addHeader(resources.getString(R.string.chart_api_key), resources.getString(R.string.chart_api_key_value))
+                .build();
     }
 }
