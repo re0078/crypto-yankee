@@ -1,11 +1,12 @@
 package com.mobiledevelopment.cryptoyankee.ui;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
-import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
 import com.mobiledevelopment.cryptoyankee.clients.ApiService;
 import com.mobiledevelopment.cryptoyankee.models.candle.CandlesChartItems;
@@ -55,7 +55,8 @@ public class CandleChartActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setTitle(currentCoinSymbol);
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         swipeRefreshLayout.setOnRefreshListener(this::setupChart);
-        findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(candlesDTO));
+        ToggleButton toggleButton = findViewById(R.id.weeklyCandlesToggle);
+        toggleButton.setOnClickListener(view -> toggleCandles(candlesDTO));
         setupChart();
     }
 
@@ -128,7 +129,6 @@ public class CandleChartActivity extends AppCompatActivity {
         CandleDataSet candleDataSet = new CandleDataSet(entries, dataSetTag);
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         candleDataSet.setShadowColor(Color.rgb(128, 0, 128));
-        candleDataSet.setValueTextColor(Color.BLUE);
         candleDataSet.setShadowWidth(0.5f);
         candleDataSet.setDecreasingColor(Color.RED);
         candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
@@ -139,5 +139,22 @@ public class CandleChartActivity extends AppCompatActivity {
         CandleData candleData = new CandleData(candleDataSet);
         candleStickChart.setData(candleData);
         candleStickChart.invalidate();
+
+
+        int nightModeFlags =
+                getApplicationContext().getResources().getConfiguration().uiMode &
+                        Configuration.UI_MODE_NIGHT_MASK;
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                candleDataSet.setValueTextColor(Color.WHITE);
+                candleDataSet.setShadowColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                candleDataSet.setValueTextColor(Color.BLACK);
+                candleDataSet.setShadowColor(Color.BLACK);
+                break;
+        }
+
     }
 }
