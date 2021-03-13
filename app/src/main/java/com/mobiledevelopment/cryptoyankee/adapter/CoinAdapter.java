@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
 import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
@@ -87,14 +88,11 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
         float usd = Float.parseFloat(item.priceUsd) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
-/*
-        Log.d("Value_Bug", item.toString());
-        Log.d("Value_Bug", String.format(Locale.ENGLISH, "%f", round));
-*/
         holder.coin_name.setText(item.name);
         holder.coin_symbol.setText(item.symbol);
-        holder.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));
+        holder.coin_price.setText(String.format(Locale.ENGLISH, "%.4f", round));
         holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.percentChange7D));
+        Glide.with(holder.itemView).load("https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.id + ".png").into(holder.coin_icon);
 
         try {
             bindPercentChangeViews(holder.one_hour_change, item.percentChange1H);
@@ -106,6 +104,8 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     }
 
     private void bindPercentChangeViews(TextView textView, String percentageValue) {
+        percentageValue = String.format(Locale.ENGLISH, "%.4f",
+                Float.valueOf(percentageValue));
         if (percentageValue.contains("-")) {
             String data = percentageValue.replace("-", "▼");
             textView.setTextColor(Color.parseColor("#FF0000"));
