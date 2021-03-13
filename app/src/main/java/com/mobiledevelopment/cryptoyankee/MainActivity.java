@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private final AtomicInteger offset = new AtomicInteger(0);
     private final AtomicBoolean hasCachedData = new AtomicBoolean(false);
 
-    private final String LOG_TAG = "MainActivity";
+    private final String LOG_TAG = "ma-TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         modelConverter = ModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
-        coinRepository.deleteCoins();
         initAdapter();
     }
 
@@ -86,38 +85,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*
-        public void loadExtraCoins() {
-            int from = offset.get();
-            List<Coin> coins = coinRepository.getLimitedCoins(from);
-            int to = offset.addAndGet(coins.size());
-            coins.forEach(coin -> {
-                coinsMap.put(coin.getId(), modelConverter.getCoinDTO(coin));
-                coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
-            });
-            adaptLoadedCoins();
-        }
-
-    */
     private void fetchCoins(boolean isFromOffset) {
 //        runOnUiThread(() -> {
-            try {
-                Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
-                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
-                        (isFromOffset ? 1 : 0) * offset.get() * loadLimit + 1);
-                coinDTOS.forEach(coinDTO -> {
-                    coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                    coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                });
-                if (isFromOffset)
-                    offset.addAndGet(loadLimit);
-                else
-                    offset.set(loadLimit);
-                adaptLoadedCoins();
-                Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
-            } catch (ApiConnectivityException e) {
+        try {
+            Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
+            List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
+                    (isFromOffset ? 1 : 0) * offset.get() * loadLimit + 1);
+            coinDTOS.forEach(coinDTO -> {
+                coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
+            });
+            if (isFromOffset)
+                offset.addAndGet(loadLimit);
+            else
+                offset.set(loadLimit);
+            adaptLoadedCoins();
+            Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
+        } catch (ApiConnectivityException e) {
 //            loadCoins();
-            }
+        }
 //        });
     }
 
@@ -160,7 +146,9 @@ public class MainActivity extends AppCompatActivity {
         coinAdapter = new CoinAdapter(recyclerView, this, loadLimit);
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
+            Log.d(LOG_TAG, "loadableCalled");
             if (coinsMap.size() <= maxCoinsCount) {
+                Log.d(LOG_TAG, "in Loadable with offset " + offset.get());
                 runProcessWithLoading(() -> fetchCoins(true));
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
