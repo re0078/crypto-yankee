@@ -91,7 +91,12 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%.4f", round));
         holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.getPercentChange7D()));
         String url = "https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.getId() + ".png";
-        Glide.with(holder.itemView).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.coin_icon);
+        Glide
+                .with(holder.itemView)
+                .load(url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .skipMemoryCache(false)
+                .into(holder.coin_icon);
 
         try {
             bindPercentChangeViews(holder.one_hour_change, item.getPercentChange1H());
