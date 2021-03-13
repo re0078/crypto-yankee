@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             coinsMap.clear();
             coinAdapter.getCoinsMap().clear();
             storedDataSize.set(0);
+            offset.set(0);
             fetchCoins(false);
             fetchCoins(true);
         }

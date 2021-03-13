@@ -91,7 +91,8 @@ public class ApiService {
                 newBuilder().
                 addQueryParameter(resources.getString(R.string.limit_key), String.valueOf(resources.getInteger(R.integer.fetch_limit))).
                 addQueryParameter(resources.getString(R.string.convert_key), resources.getString(R.string.usd_val)).
-                addQueryParameter(resources.getString(R.string.start_key), String.valueOf(offset));
+                addQueryParameter(resources.getString(R.string.start_key), String.valueOf(offset)).
+                addQueryParameter(resources.getString(R.string.sort_key), resources.getString(R.string.sort_val));
         return new Request.Builder().
                 url(urlBuilder.build().toString()).
                 addHeader(resources.getString(R.string.info_api_key), resources.getString(R.string.info_api_key_value)).

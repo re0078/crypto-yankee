@@ -10,6 +10,8 @@
     <integer name="fetch_limit">5</integer>
     <string name="start_key">start</string>
     <integer name="max_poll">100</integer>
+    <string name="sort_key">sort</string>
+    <string name="sort_val">market_cap</string>
 
     <!--> CoinMarketCap api values. Coins general information<!-->
     <string name="candle_api">https://rest.coinapi.io/v1/ohlcv/</string>
