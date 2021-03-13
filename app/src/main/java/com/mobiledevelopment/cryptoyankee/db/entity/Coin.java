@@ -9,6 +9,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Data
 public class Coin {
+    private Long dbId;
     private Integer id;
     private String name;
     private String symbol;

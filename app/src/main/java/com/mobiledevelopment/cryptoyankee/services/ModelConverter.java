@@ -19,18 +19,19 @@ public class ModelConverter {
 
     public Coin getCoinEntity(CoinDTO coinDTO) {
         Coin coin = new Coin();
-        coin.setId(Integer.parseInt(coinDTO.id));
-        coin.setName(coinDTO.name);
-        coin.setSymbol(coinDTO.symbol);
-        coin.setPriceUsd(Double.parseDouble(coinDTO.priceUsd));
-        coin.setHChangePercentage(Double.parseDouble(coinDTO.percentChange1H));
-        coin.setDChangePercentage(Double.parseDouble(coinDTO.percentChange24H));
-        coin.setWChangePercentage(Double.parseDouble(coinDTO.percentChange7D));
+        coin.setId(Integer.parseInt(coinDTO.getId()));
+        coin.setName(coinDTO.getName());
+        coin.setSymbol(coinDTO.getSymbol());
+        coin.setPriceUsd(Double.parseDouble(coinDTO.getPriceUsd()));
+        coin.setHChangePercentage(Double.parseDouble(coinDTO.getPercentChange1H()));
+        coin.setDChangePercentage(Double.parseDouble(coinDTO.getPercentChange24H()));
+        coin.setWChangePercentage(Double.parseDouble(coinDTO.getPercentChange7D()));
         return coin;
     }
 
     public CoinDTO getCoinDTO(Coin coin) {
         CoinDTO coinDTO = new CoinDTO();
+        coinDTO.setDbId(coin.getDbId());
         coinDTO.setId(Integer.toString(coin.getId()));
         coinDTO.setName(coin.getName());
         coinDTO.setSymbol(coin.getSymbol());

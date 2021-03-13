@@ -32,9 +32,9 @@ public class CoinRepository {
 
     public List<Coin> getLimitedCoins(int offset) {
         SQLiteDatabase db = coinDBHelper.getReadableDatabase();
-        String[] columns = {COIN_ID, CURR_NAME, CURR_SYMBOL, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
+        String[] columns = {_ID, COIN_ID, CURR_NAME, CURR_SYMBOL, PRICE_USD, H_CHANGE_PERCENT, D_CHANGE_PERCENT, W_CHANGE_PERCENT};
         Cursor cursor = db.query(TABLE_NAME, columns, null, null,
-                null, null, null, offset + "," + maxRecords);
+                null, null, null, null);
         List<Coin> coins = new ArrayList<>();
         while (cursor.moveToNext()) {
             coins.add(readCoin(cursor));
@@ -45,6 +45,7 @@ public class CoinRepository {
 
     private Coin readCoin(Cursor cursor) {
         Coin coin = new Coin();
+        coin.setDbId(cursor.getLong(cursor.getColumnIndexOrThrow(_ID)));
         coin.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COIN_ID)));
         coin.setName(cursor.getString(cursor.getColumnIndexOrThrow(CURR_NAME)));
         coin.setSymbol(cursor.getString(cursor.getColumnIndexOrThrow(CURR_SYMBOL)));

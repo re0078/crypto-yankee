@@ -3,17 +3,27 @@ package com.mobiledevelopment.cryptoyankee.models.coin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
 @Data
 public class CoinDTO {
-    public String id;
-    public String name;
-    public String symbol;
-    public String priceUsd;
-    public String percentChange1H;
-    public String percentChange24H;
-    public String percentChange7D;
+    private Long dbId;
+    @NonNull
+    private String id;
+    @NonNull
+    private String name;
+    @NonNull
+    private String symbol;
+    @NonNull
+    private String priceUsd;
+    @NonNull
+    private String percentChange1H;
+    @NonNull
+    private String percentChange24H;
+    @NonNull
+    private String percentChange7D;
 }
 

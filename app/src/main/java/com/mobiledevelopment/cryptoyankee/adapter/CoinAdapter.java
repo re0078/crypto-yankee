@@ -19,9 +19,9 @@ import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
 import com.mobiledevelopment.cryptoyankee.ui.CoinViewHolder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,14 +32,14 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
     private final Activity activity;
     @Getter
-    private final Map<Integer, CoinDTO> coinsMap;
+    private final SortedMap<Long, CoinDTO> coinsMap;
     @Setter
     private Loadable loadable;
     @Getter
     private AtomicBoolean isLoading = new AtomicBoolean(false);
 
     public CoinAdapter(RecyclerView recyclerView, Activity activity, int loadLimit) {
-        this.coinsMap = new HashMap<>();
+        this.coinsMap = new TreeMap<>();
         this.activity = activity;
         AtomicInteger visibleThreshold = new AtomicInteger(5);
         if (loadLimit != 0)
@@ -81,18 +81,18 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     public void onBindViewHolder(@NonNull CoinViewHolder holder, int position) {
         CoinDTO item = new ArrayList<>(coinsMap.values()).get(position);
 
-        float usd = Float.parseFloat(item.priceUsd) * 1000000;
+        float usd = Float.parseFloat(item.getPriceUsd()) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
-        holder.coin_name.setText(item.name);
-        holder.coin_symbol.setText(item.symbol);
+        holder.coin_name.setText(item.getName());
+        holder.coin_symbol.setText(item.getSymbol());
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%.4f", round));
-        holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.percentChange7D));
-        Glide.with(holder.itemView).load("https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.id + ".png").into(holder.coin_icon);
+        holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.getPercentChange7D()));
+        Glide.with(holder.itemView).load("https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.getId() + ".png").into(holder.coin_icon);
 
         try {
-            bindPercentChangeViews(holder.one_hour_change, item.percentChange1H);
-            bindPercentChangeViews(holder.twenty_hours_change, item.percentChange24H);
-            bindPercentChangeViews(holder.seven_days_change, item.percentChange7D);
+            bindPercentChangeViews(holder.one_hour_change, item.getPercentChange1H());
+            bindPercentChangeViews(holder.twenty_hours_change, item.getPercentChange24H());
+            bindPercentChangeViews(holder.seven_days_change, item.getPercentChange7D());
         } catch (Exception e) {
             Log.d("ColorError", e.getMessage());
         }

@@ -12,6 +12,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.mobiledevelopment.cryptoyankee.adapter.CoinAdapter;
 import com.mobiledevelopment.cryptoyankee.clients.ApiService;
+import com.mobiledevelopment.cryptoyankee.db.dao.CoinDBHelper;
 import com.mobiledevelopment.cryptoyankee.db.dao.CoinRepository;
 import com.mobiledevelopment.cryptoyankee.db.entity.Coin;
 import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
@@ -25,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private ModelConverter modelConverter;
     private ApiService apiService;
     private ThreadPoolService threadPoolService;
-    private final Map<Integer, CoinDTO> coinsMap = new HashMap<>();
+    private final SortedMap<Long, CoinDTO> coinsMap = new TreeMap<>();
     private Integer loadLimit;
     private Integer maxCoinsCount;
     private final AtomicInteger offset = new AtomicInteger(0);
@@ -50,13 +53,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(() -> {
-            fetchCoins(false);
-            fetchCoins(true);
-        });
+        runProcessWithLoading(() -> initCoins(true));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
-            runProcessWithLoading(() -> fetchCoins(false));
+            runProcessWithLoading(() -> initCoins(false));
         });
     }
 
@@ -66,6 +66,15 @@ public class MainActivity extends AppCompatActivity {
         storeCoins();
     }
 
+    private void initCoins(boolean fromDB) {
+        if (fromDB) {
+            loadCoins();
+        } else {
+            fetchCoins(false);
+            fetchCoins(true);
+        }
+    }
+
     private void setupBeans() {
         loadLimit = getResources().getInteger(R.integer.fetch_limit);
         maxCoinsCount = getResources().getInteger(R.integer.max_poll);
@@ -73,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
         threadPoolService = ThreadPoolService.getInstance();
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         modelConverter = ModelConverter.getInstance();
-        coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
-        coinRepository.deleteCoins();
+        coinRepository = CoinRepository.getInstance(getBaseContext(), 2 * loadLimit);
+//        coinRepository.deleteCoins();
         initAdapter();
     }
 
@@ -90,10 +99,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
             List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
                     (isFromOffset ? 1 : 0) * offset.get() * loadLimit + 1);
-            coinDTOS.forEach(coinDTO -> {
-                coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
-            });
+            int offsetIndex = offset.get();
+            for (int i = 0; i < coinDTOS.size(); i++) {
+                CoinDTO coinDTO = coinDTOS.get(i);
+                coinDTO.setDbId((long) i + 1 + offsetIndex);
+                coinsMap.put(coinDTO.getDbId(), coinDTO);
+                coinAdapter.getCoinsMap().put(coinDTO.getDbId(), coinDTO);
+            }
             if (isFromOffset)
                 offset.addAndGet(loadLimit);
             else
@@ -109,13 +121,14 @@ public class MainActivity extends AppCompatActivity {
     private void loadCoins() {
         List<Coin> coins = coinRepository.getLimitedCoins(0);
         coins.forEach(coin -> {
-            coinsMap.put(coin.getId(), modelConverter.getCoinDTO(coin));
-            coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
+            CoinDTO coinDTO = modelConverter.getCoinDTO(coin);
+            coinsMap.put(coin.getDbId(), coinDTO);
+            coinAdapter.getCoinsMap().put(coin.getDbId(), coinDTO);
         });
         int size = coins.size();
         adaptLoadedCoins();
         offset.addAndGet(size);
-        storedDataSize.set(size);
+        storedDataSize.addAndGet(size);
     }
 
     private void adaptLoadedCoins() {
