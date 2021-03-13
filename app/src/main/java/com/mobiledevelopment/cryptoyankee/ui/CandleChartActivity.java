@@ -100,10 +100,13 @@ public class CandleChartActivity extends AppCompatActivity {
 
     private void draw_chart(String coinName, CandlesDTO candlesDTO) {
         ArrayList<CandlesChartItems> candlesList;
-        if (weeklyCandlesOn) candlesList = candlesDTO.getWeeklyCandles();
-        else candlesList = candlesDTO.getMonthlyCandles();
+        if (weeklyCandlesOn)
+            candlesList = candlesDTO.getWeeklyCandles();
+        else
+            candlesList = candlesDTO.getMonthlyCandles();
 
         ArrayList<CandleEntry> entries = new ArrayList<>();
+
         for (int i = 0; i < candlesList.size(); i++) {
 
             float high = candlesList.get(i).priceHigh;
