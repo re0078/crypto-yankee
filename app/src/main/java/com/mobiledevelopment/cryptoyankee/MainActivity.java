@@ -66,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
         storeCoins();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        runOnUiThread(() -> swipeRefreshLayout.setRefreshing(false));
+    }
+
     private void initCoins(boolean fromDB) {
         if (fromDB) {
             boolean hasCachedData = loadCoins();
@@ -154,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, CandleChartActivity.class);
         intent.putExtra(CandleChartActivity.COIN_NAME_KEY, coinName);
         intent.putExtra(CandleChartActivity.COIN_SYMBOL_KEY, coinSymbol);
+        runOnUiThread(() -> swipeRefreshLayout.setRefreshing(true));
         startActivity(intent);
     }
 
