@@ -15,7 +15,7 @@
     <string name="candle_api">https://rest.coinapi.io/v1/ohlcv/</string>
     <string name="usd_history_uri">/USD/history</string>
     <string name="chart_api_key">X-CoinAPI-Key</string>
-    <string name="chart_api_key_value">7DA58282-197D-42AC-B096-AF5A99EEE083</string>
+    <string name="chart_api_key_value">AE8BCC08-FEEC-49F3-ACBB-991A4DF62204</string>
     <string name="period_key">period_id</string>
     <string name="period_val">1DAY</string>
     <string name="time_start_key">time_start</string>

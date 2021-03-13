@@ -29,68 +29,54 @@ import java.util.Objects;
 
 public class CandleChartActivity extends AppCompatActivity {
 
-    private ThreadPoolService threadPoolService;
+    public static final String COIN_NAME_KEY = "coin_name";
+    public static final String COIN_SYMBOL_KEY = "coin_symbol";
+
     private boolean weeklyCandlesOn = true;
-    private CandlesDTO candlesDTO;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chart_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
-        threadPoolService = ThreadPoolService.getInstance();
         ApiService apiService = ApiService.getInstance(getResources());
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         String currentCoinSymbol = getIntent().getStringExtra(COIN_SYMBOL_KEY);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
-        swipeRefreshLayout.post(this::load_candles);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(CandleChartActivity.this,
                     "Please Wait until Loading is Complete.", Toast.LENGTH_SHORT).show();
-            load_candles();
         });
 
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime startWeek = currentTime.minusDays(7);
-        LocalDateTime startMonth = currentTime.minusMonths(1);
+        LocalDateTime startMonth = currentTime.minusDays(30);
         Log.d("time_sweet_time", startWeek.toString() + "reza" + startMonth.toString());
 
-        candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
+        CandlesDTO candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
 
         candlesDTO.setCoinName(currentCoinName);
         candlesDTO.setCoinSymbol(currentCoinSymbol);
 
         Log.d("sepi", Integer.toString(candlesDTO.getMonthlyCandles().size()));
-        for (int i = 0; i < 27; i++){
+        for (int i = 0; i < 27; i++) {
             Log.d("candle_debug", candlesDTO.getMonthlyCandles().get(i).toString());
         }
 
-        draw_chart(candlesDTO.getWeeklyCandles());
-        findViewById(R.id.weeklyCandlesToggle).setOnClickListener(this::toggleCandles);
+        draw_chart(currentCoinName, candlesDTO.getWeeklyCandles());
+        findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(currentCoinName, candlesDTO));
     }
 
-    private void toggleCandles(View view) {
-        Log.d("yashi", "amin");
+    private void toggleCandles(String coinName, CandlesDTO candlesDTO) {
         weeklyCandlesOn = !weeklyCandlesOn;
         if (weeklyCandlesOn) {
-            draw_chart(candlesDTO.getWeeklyCandles());
+            draw_chart(coinName, candlesDTO.getWeeklyCandles());
         } else {
-            draw_chart(candlesDTO.getMonthlyCandles());
+            draw_chart(coinName, candlesDTO.getMonthlyCandles());
         }
     }
 
-    private void load_candles() {
-        threadPoolService.execute(() -> {
-            // initialize candles (both weekly and monthly) from candles service TODO
-            candlesDTO = new CandlesDTO("1", "bitcoin",
-                    new ArrayList<>(),
-                    new ArrayList<>()
-            );
-
-        });
-    }
-
-    private void draw_chart(ArrayList<CandlesChartItems> candlesList) {
+    private void draw_chart(String coinName, ArrayList<CandlesChartItems> candlesList) {
         ArrayList<CandleEntry> entries = new ArrayList<>();
         for (int i = 0; i < candlesList.size(); i++) {
 
@@ -109,9 +95,9 @@ public class CandleChartActivity extends AppCompatActivity {
         }
         String dataSetTag;
         if (weeklyCandlesOn) {
-            dataSetTag = candlesDTO.getCoinName() + "weekly";
+            dataSetTag = coinName + "weekly";
         } else {
-            dataSetTag = candlesDTO.getCoinName() + "monthly";
+            dataSetTag = coinName + "monthly";
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, dataSetTag);
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -127,8 +113,4 @@ public class CandleChartActivity extends AppCompatActivity {
         candleStickChart.setData(candleData);
         candleStickChart.invalidate();
     }
-
-    public static final String COIN_NAME_KEY = "coin_name";
-
-    public static final String COIN_SYMBOL_KEY = "coin_symbol";
 }
