@@ -120,9 +120,6 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
     @Override
     public int getItemCount() {
-        if (coinsMap.isEmpty())
-            Toast.makeText(activity, "There is no cached data. " +
-                    "Please swipe down to fetch online data from server", Toast.LENGTH_LONG).show();
         return coinsMap.size();
     }
 }

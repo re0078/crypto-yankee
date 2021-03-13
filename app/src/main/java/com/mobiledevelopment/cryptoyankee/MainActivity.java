@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(this::loadCoins);
+        runProcessWithLoading(() -> fetchCoins(false));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             runProcessWithLoading(() -> fetchCoins(false));
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void runProcessWithLoading(Runnable runnable) {
         runOnUiThread(() -> {
-            swipeRefreshLayout.setRefreshing(true);
+//            swipeRefreshLayout.setRefreshing(true);
             runnable.run();
             swipeRefreshLayout.setRefreshing(false);
         });
