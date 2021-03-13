@@ -38,10 +38,10 @@ public class CandleChartActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chart_main);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("UHLC");
         ApiService apiService = ApiService.getInstance(getResources());
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         String currentCoinSymbol = getIntent().getStringExtra(COIN_SYMBOL_KEY);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(currentCoinSymbol);
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.rootLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(CandleChartActivity.this,

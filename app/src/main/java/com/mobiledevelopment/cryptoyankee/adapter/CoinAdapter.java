@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
@@ -34,7 +35,8 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     private final Map<Integer, CoinDTO> coinsMap;
     @Setter
     private Loadable loadable;
-    private boolean isLoading;
+    @Getter
+    private AtomicBoolean isLoading = new AtomicBoolean(false);
 
     public CoinAdapter(RecyclerView recyclerView, Activity activity, int loadLimit) {
         this.coinsMap = new HashMap<>();
@@ -52,10 +54,13 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
                     assert linearLayoutManager != null;
                     int totalItemCount = linearLayoutManager.getItemCount();
                     int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
+                    Log.d("ca-TAG", "isLoading: " + isLoading.get() + " tIC: " +
+                            totalItemCount + " lVI: " + lastVisibleItem + " vT: " + visibleThreshold.get());
+                    if (totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
+                        Log.d("ca-TAG", "Track #2");
                         if (loadable != null)
                             loadable.onLoadMore();
-                        isLoading = true;
+                        isLoading.set(true);
                     }
                 }
             }
@@ -82,8 +87,10 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
         float usd = Float.parseFloat(item.priceUsd) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
+/*
         Log.d("Value_Bug", item.toString());
         Log.d("Value_Bug", String.format(Locale.ENGLISH, "%f", round));
+*/
         holder.coin_name.setText(item.name);
         holder.coin_symbol.setText(item.symbol);
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));

@@ -57,15 +57,15 @@ public class CoinRepository {
 
     public void putCoins(List<Coin> coins) {
         SQLiteDatabase db = coinDBHelper.getWritableDatabase();
-        coins.forEach(coin -> db.insert(TABLE_NAME, null, setCoinValues(coin)));
+        coins.forEach(coin -> db.insert(TABLE_NAME, null, setCoinValues(coin, false)));
+        Log.d("db-TAG", "size: " + coins.size());
     }
 
     public void updateCoins(List<Coin> coins) {
         SQLiteDatabase db = coinDBHelper.getWritableDatabase();
         coins.forEach(coin -> {
-            String selection = COIN_ID + " = ";
-            String[] selectionArgs = {Integer.toString(coin.getId())};
-            db.update(TABLE_NAME, setCoinValues(coin), selection, selectionArgs);
+            String selection = COIN_ID + " = " + coin.getId();
+            db.update(TABLE_NAME, setCoinValues(coin, true), selection, null);
         });
     }
 
@@ -74,9 +74,10 @@ public class CoinRepository {
         db.delete(TABLE_NAME, null, null);
     }
 
-    private ContentValues setCoinValues(Coin coin) {
+    private ContentValues setCoinValues(Coin coin, boolean isUpdate) {
         ContentValues values = new ContentValues();
-        values.put(COIN_ID, coin.getId());
+        if (!isUpdate)
+            values.put(COIN_ID, coin.getId());
         values.put(CURR_NAME, coin.getName());
         values.put(CURR_SYMBOL, coin.getSymbol());
         values.put(PRICE_USD, coin.getPriceUsd());

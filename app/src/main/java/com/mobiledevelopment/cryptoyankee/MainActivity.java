@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Integer maxCoinsCount;
     private Integer nonCompletePage;
     private final AtomicInteger offset = new AtomicInteger(0);
-    private final AtomicBoolean hasCachedData = new AtomicBoolean(false);
+    private final AtomicInteger storedDataSize = new AtomicInteger(0);
 
     private final String LOG_TAG = "ma-TAG";
 
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        storeCoins(hasCachedData.get());
+        storeCoins();
     }
 
     private void setupBeans() {
@@ -74,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         modelConverter = ModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), loadLimit);
+        coinRepository.deleteCoins();
         initAdapter();
     }
 
@@ -102,7 +102,8 @@ public class MainActivity extends AppCompatActivity {
             adaptLoadedCoins();
             Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
         } catch (ApiConnectivityException e) {
-//            loadCoins();
+            Toast.makeText(MainActivity.this, "Api not accessible.", Toast.LENGTH_SHORT).show();
+            loadCoins();
         }
 //        });
     }
@@ -115,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
         });
         int size = coins.size();
         adaptLoadedCoins();
-//        offset.addAndGet(size);
-        hasCachedData.set(size != 0);
+        offset.addAndGet(size);
+        storedDataSize.set(size);
     }
 
     private void adaptLoadedCoins() {
@@ -131,13 +132,12 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "UTLC Chart Activity Started");
     }
 
-    private void storeCoins(boolean isUpdate) {
+    private void storeCoins() {
         List<Coin> coins = new ArrayList<>();
         coinsMap.forEach((id, coinDTO) -> coins.add(modelConverter.getCoinEntity(coinDTO)));
-        if (isUpdate)
-            coinRepository.updateCoins(coins);
-        else
-            coinRepository.putCoins(coins);
+        int dataSize = storedDataSize.get();
+        coinRepository.updateCoins(coins.subList(0, dataSize));
+        coinRepository.putCoins(coins.subList(dataSize, coins.size()));
     }
 
     private void initAdapter() {
@@ -149,7 +149,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOG_TAG, "loadableCalled");
             if (coinsMap.size() <= maxCoinsCount) {
                 Log.d(LOG_TAG, "in Loadable with offset " + offset.get());
-                runProcessWithLoading(() -> fetchCoins(true));
+                runProcessWithLoading(() -> {
+                    fetchCoins(true);
+                    coinAdapter.getIsLoading().set(false);
+                    Log.d(LOG_TAG, "isLoading: " + coinAdapter.getIsLoading().get());
+                });
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }
