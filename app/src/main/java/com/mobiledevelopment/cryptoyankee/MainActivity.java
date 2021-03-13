@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(() -> initCoins(true));
+        runProcessWithLoading(() -> initCoins(false));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             runProcessWithLoading(() -> initCoins(false));
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         if (fromDB) {
             loadCoins();
         } else {
+            coinRepository.deleteCoins();
             fetchCoins(false);
             fetchCoins(true);
         }
@@ -83,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.rootLayout);
         modelConverter = ModelConverter.getInstance();
         coinRepository = CoinRepository.getInstance(getBaseContext(), 2 * loadLimit);
-//        coinRepository.deleteCoins();
         initAdapter();
     }
 
