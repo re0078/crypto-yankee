@@ -59,13 +59,12 @@ public class ApiService {
     public List<CoinDTO> getCoinsInfo(int start) {
         Request request = buildFetchCoinsInfoRequest(start);
         List<CoinDTO> coinDTOS = new ArrayList<>();
-        CompletableFuture<Void> lockCompletableFuture = new CompletableFuture<>();
+        CompletableFuture<Boolean> lockCompletableFuture = new CompletableFuture<>();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Log.wtf("Api", "getCoinsInfo->onFailure: ", e);
-                lockCompletableFuture.complete(null);
-                throw new ApiConnectivityException();
+                lockCompletableFuture.complete(false);
             }
 
             @Override
@@ -75,14 +74,15 @@ public class ApiService {
                             readValue(Objects.requireNonNull(response.body()).string(),
                                     ServerInfoResponse.class);
                     serverInfoResponse.getServerCoinDTOS().forEach(serverCoinDTO -> coinDTOS.add(converter.getCoinDTO(serverCoinDTO)));
+                    lockCompletableFuture.complete(true);
                 } else {
                     Log.e("Api", "getCoinsInfo->onResponse code: " + response.code());
-                    throw new ApiConnectivityException();
+                    lockCompletableFuture.complete(false);
                 }
-                lockCompletableFuture.complete(null);
             }
         });
-        lockCompletableFuture.join();
+        if (!lockCompletableFuture.join())
+            throw new ApiConnectivityException();
         return coinDTOS;
     }
 
