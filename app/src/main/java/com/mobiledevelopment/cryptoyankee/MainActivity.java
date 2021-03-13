@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         runProcessWithLoading(this::loadCoins);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
-            runProcessWithLoading(this::fetchCoins);
+            runProcessWithLoading(() -> fetchCoins(false));
         });
     }
 
@@ -79,43 +79,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runProcessWithLoading(Runnable runnable) {
-        threadPoolService.execute(() -> {
+        runOnUiThread(() -> {
             swipeRefreshLayout.setRefreshing(true);
             runnable.run();
             swipeRefreshLayout.setRefreshing(false);
         });
     }
 
-    public void loadExtraCoins() {
-        int from = offset.get();
-        List<Coin> coins = coinRepository.getLimitedCoins(from);
-        int to = offset.addAndGet(coins.size());
-        coins.forEach(coin -> {
-            coinsMap.put(coin.getId(), modelConverter.getCoinDTO(coin));
-            coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
-        });
-        adaptLoadedCoins();
-    }
+    /*
+        public void loadExtraCoins() {
+            int from = offset.get();
+            List<Coin> coins = coinRepository.getLimitedCoins(from);
+            int to = offset.addAndGet(coins.size());
+            coins.forEach(coin -> {
+                coinsMap.put(coin.getId(), modelConverter.getCoinDTO(coin));
+                coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
+            });
+            adaptLoadedCoins();
+        }
 
-    private void fetchCoins() {
-        runOnUiThread(() -> {
+    */
+    private void fetchCoins(boolean isFromOffset) {
+//        runOnUiThread(() -> {
             try {
-                for (int i = 0; i < 1; i++) {
-                    List<CoinDTO> coinDTOS = apiService.getCoinsInfo(i * loadLimit + 1);
-                    coinDTOS.forEach(coinDTO -> {
-                        coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                        coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                    });
-                    for (Integer id : coinsMap.keySet()) {
-                        Log.i(LOG_TAG, String.valueOf(id));
-                    }
-                    adaptLoadedCoins();
-                }
+                Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
+                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
+                        (isFromOffset ? 1 : 0) * offset.get() * loadLimit + 1);
+                coinDTOS.forEach(coinDTO -> {
+                    coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                    coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                });
+                if (isFromOffset)
+                    offset.addAndGet(loadLimit);
+                else
+                    offset.set(loadLimit);
+                adaptLoadedCoins();
                 Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
             } catch (ApiConnectivityException e) {
 //            loadCoins();
             }
-        });
+//        });
     }
 
     private void loadCoins() {
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         });
         int size = coins.size();
         adaptLoadedCoins();
-        offset.addAndGet(size);
+//        offset.addAndGet(size);
         hasCachedData.set(size != 0);
     }
 
@@ -158,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
             if (coinsMap.size() <= maxCoinsCount) {
-                //runProcessWithLoading(this::fetchCoins);
+                runProcessWithLoading(() -> fetchCoins(true));
             } else {
                 Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
             }

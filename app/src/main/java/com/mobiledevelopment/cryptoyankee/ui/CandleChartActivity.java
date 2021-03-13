@@ -64,15 +64,15 @@ public class CandleChartActivity extends AppCompatActivity {
         }
 
         draw_chart(currentCoinName, candlesDTO.getWeeklyCandles());
-        findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(currentCoinName, candlesDTO));
+        findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(candlesDTO));
     }
 
-    private void toggleCandles(String coinName, CandlesDTO candlesDTO) {
+    private void toggleCandles(CandlesDTO candlesDTO) {
         weeklyCandlesOn = !weeklyCandlesOn;
         if (weeklyCandlesOn) {
-            draw_chart(coinName, candlesDTO.getWeeklyCandles());
+            draw_chart(candlesDTO.getCoinName(), candlesDTO.getWeeklyCandles());
         } else {
-            draw_chart(coinName, candlesDTO.getMonthlyCandles());
+            draw_chart(candlesDTO.getCoinName(), candlesDTO.getMonthlyCandles());
         }
     }
 
