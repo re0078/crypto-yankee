@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(() -> initCoins(false));
+        runProcessWithLoading(() -> initCoins(true));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             runProcessWithLoading(() -> initCoins(false));
@@ -68,9 +68,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void initCoins(boolean fromDB) {
         if (fromDB) {
-            loadCoins();
+            boolean hasCachedData = loadCoins();
+            if (!hasCachedData)
+                initCoins(false);
         } else {
             coinRepository.deleteCoins();
+            coinsMap.clear();
+            coinAdapter.getCoinsMap().clear();
+            storedDataSize.set(0);
             fetchCoins(false);
             fetchCoins(true);
         }
@@ -131,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadCoins() {
+    private boolean loadCoins() {
         List<Coin> coins = coinRepository.getLimitedCoins(0);
         coins.forEach(coin -> {
             CoinDTO coinDTO = modelConverter.getCoinDTO(coin);
@@ -141,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         int size = coins.size();
         offset.addAndGet(size);
         storedDataSize.addAndGet(size);
+        return size != 0;
     }
 
     public void showUTLCChart(String coinName, String coinSymbol) {
