@@ -87,13 +87,9 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
         float usd = Float.parseFloat(item.priceUsd) * 1000000;
         float round = (float) (Math.round(usd) / 1000000.0);
-/*
-        Log.d("Value_Bug", item.toString());
-        Log.d("Value_Bug", String.format(Locale.ENGLISH, "%f", round));
-*/
         holder.coin_name.setText(item.name);
         holder.coin_symbol.setText(item.symbol);
-        holder.coin_price.setText(String.format(Locale.ENGLISH, "%f", round));
+        holder.coin_price.setText(String.format(Locale.ENGLISH, "%.4f", round));
         holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.percentChange7D));
 
         try {
@@ -106,6 +102,8 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     }
 
     private void bindPercentChangeViews(TextView textView, String percentageValue) {
+        percentageValue = String.format(Locale.ENGLISH, "%.4f",
+                Float.valueOf(percentageValue));
         if (percentageValue.contains("-")) {
             String data = percentageValue.replace("-", "▼");
             textView.setTextColor(Color.parseColor("#FF0000"));

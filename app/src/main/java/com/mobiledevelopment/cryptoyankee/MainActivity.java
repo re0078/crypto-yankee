@@ -79,14 +79,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void runProcessWithLoading(Runnable runnable) {
         runOnUiThread(() -> {
-//            swipeRefreshLayout.setRefreshing(true);
             runnable.run();
             swipeRefreshLayout.setRefreshing(false);
         });
     }
 
     private void fetchCoins(boolean isFromOffset) {
-//        runOnUiThread(() -> {
         try {
             Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
             List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
@@ -105,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Api not accessible.", Toast.LENGTH_SHORT).show();
             loadCoins();
         }
-//        });
     }
 
     private void loadCoins() {

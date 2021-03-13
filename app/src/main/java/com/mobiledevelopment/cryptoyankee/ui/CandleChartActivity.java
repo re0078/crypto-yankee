@@ -95,9 +95,9 @@ public class CandleChartActivity extends AppCompatActivity {
         }
         String dataSetTag;
         if (weeklyCandlesOn) {
-            dataSetTag = coinName + "weekly";
+            dataSetTag = coinName + "-weekly";
         } else {
-            dataSetTag = coinName + "monthly";
+            dataSetTag = coinName + "-monthly";
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, dataSetTag);
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
