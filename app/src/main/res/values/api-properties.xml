@@ -3,7 +3,7 @@
     <!--> CoinMarketCap api values. Coins general information<!-->
     <string name="info_api">https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest</string>
     <string name="info_api_key">X-CMC_PRO_API_KEY</string>
-    <string name="info_api_key_value">929d57a0-ed74-4022-9c10-d14f873f418c</string>
+    <string name="info_api_key_value">04f52a9c-33e1-452e-85cc-f5bd211ab081</string>
     <string name="convert_key">convert</string>
     <string name="usd_val">USD</string>
     <string name="limit_key">limit</string>
@@ -17,7 +17,7 @@
     <string name="candle_api">https://rest.coinapi.io/v1/ohlcv/</string>
     <string name="usd_history_uri">/USD/history</string>
     <string name="chart_api_key">X-CoinAPI-Key</string>
-    <string name="chart_api_key_value">C520AA2A-866E-458A-8EAE-233C80F30C32</string>
+    <string name="chart_api_key_value">7DA58282-197D-42AC-B096-AF5A99EEE083</string>
     <string name="period_key">period_id</string>
     <string name="period_val">1DAY</string>
     <string name="time_start_key">time_start</string>
