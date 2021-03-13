@@ -100,26 +100,21 @@ public class ApiService {
 
     public CandlesDTO getCandleInfo(String symbol, LocalDateTime startWeek, LocalDateTime startMonth) {
         CandlesDTO candlesDTO = new CandlesDTO();
-        Log.d("week_tag", symbol + startWeek);
         Request request = buildFetchCandlesInfoRequest(symbol, startWeek);
-        Log.d("req1_tag", request.toString());
         candlesDTO.setWeeklyCandles(callCandlesInfoApi(request));
-        Log.d("month_tag", symbol + startMonth);
         Request request2 = buildFetchCandlesInfoRequest(symbol, startMonth);
-        Log.d("req2_tag", request2.toString());
         candlesDTO.setMonthlyCandles(callCandlesInfoApi(request2));
         return candlesDTO;
     }
 
     private ArrayList<CandlesChartItems> callCandlesInfoApi(Request request) {
-        CompletableFuture<Void> lockCompletableFuture = new CompletableFuture<>();
+        CompletableFuture<Boolean> lockCompletableFuture = new CompletableFuture<>();
         ArrayList<CandlesChartItems> items = new ArrayList<>();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Log.wtf("Api", "callCandlesInfoApi->onFailure: ", e);
-                lockCompletableFuture.complete(null);
-                throw new ApiConnectivityException();
+                lockCompletableFuture.complete(false);
             }
 
             @Override
@@ -131,15 +126,15 @@ public class ApiService {
                     for (ServerCandleDTO serverCandleDTO : responseItems) {
                         items.add(converter.getChartItem(serverCandleDTO));
                     }
+                    lockCompletableFuture.complete(true);
                 } else {
                     Log.e("Api", "callCandlesInfoApi->onResponse code: " + response.code());
-                    throw new ApiConnectivityException();
+                    lockCompletableFuture.complete(false);
                 }
-                lockCompletableFuture.complete(null);
             }
         });
-        lockCompletableFuture.join();
-        Log.d("number_tag", Integer.toString(items.size()));
+        if (!lockCompletableFuture.join())
+            throw new ApiConnectivityException();
         return items;
     }
 

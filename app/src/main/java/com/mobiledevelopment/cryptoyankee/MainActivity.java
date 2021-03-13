@@ -51,10 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(() -> {
-            fetchCoins(false);
-            fetchCoins(true);
-        });
+        runProcessWithLoading(() -> fetchCoins(false));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             runProcessWithLoading(() -> fetchCoins(false));
@@ -89,19 +86,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchCoins(boolean isFromOffset) {
         try {
-            Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
-            List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
-                    (isFromOffset ? 1 : 0) * offset.get() * loadLimit + 1);
-            coinDTOS.forEach(coinDTO -> {
-                coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
-                coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
-            });
-            if (isFromOffset)
-                offset.addAndGet(loadLimit);
-            else
-                offset.set(loadLimit);
-            adaptLoadedCoins();
-            Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
+            for (int i = 0; i < 2; i++) {
+                Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
+                List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
+                        (isFromOffset ? 1 : 0) * offset.get() * loadLimit + 1);
+                coinDTOS.forEach(coinDTO -> {
+                    coinsMap.put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                    coinAdapter.getCoinsMap().put(Integer.parseInt(coinDTO.getId()), coinDTO);
+                });
+                if (isFromOffset)
+                    offset.addAndGet(loadLimit);
+                else
+                    offset.set(loadLimit);
+                adaptLoadedCoins();
+                Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
+            }
         } catch (ApiConnectivityException e) {
             Toast.makeText(MainActivity.this, "Api not accessible.", Toast.LENGTH_SHORT).show();
             loadCoins();
@@ -129,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(CandleChartActivity.COIN_NAME_KEY, coinName);
         intent.putExtra(CandleChartActivity.COIN_SYMBOL_KEY, coinSymbol);
         startActivity(intent);
-        Log.i(LOG_TAG, "UTLC Chart Activity Started");
     }
 
     private void storeCoins() {
@@ -146,16 +144,14 @@ public class MainActivity extends AppCompatActivity {
         coinAdapter = new CoinAdapter(recyclerView, this, loadLimit);
         recyclerView.setAdapter(coinAdapter);
         coinAdapter.setLoadable(() -> {
-            Log.d(LOG_TAG, "loadableCalled");
             if (coinsMap.size() <= maxCoinsCount) {
-                Log.d(LOG_TAG, "in Loadable with offset " + offset.get());
                 runProcessWithLoading(() -> {
                     fetchCoins(true);
                     coinAdapter.getIsLoading().set(false);
-                    Log.d(LOG_TAG, "isLoading: " + coinAdapter.getIsLoading().get());
                 });
             } else {
-                Toast.makeText(MainActivity.this, "Max items is 1000", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Max items is " + maxCoinsCount,
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }

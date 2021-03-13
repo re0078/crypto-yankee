@@ -16,10 +16,12 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
 import com.mobiledevelopment.cryptoyankee.clients.ApiService;
 import com.mobiledevelopment.cryptoyankee.models.candle.CandlesChartItems;
 import com.mobiledevelopment.cryptoyankee.models.candle.CandlesDTO;
+import com.mobiledevelopment.cryptoyankee.models.exception.ApiConnectivityException;
 import com.mobiledevelopment.cryptoyankee.services.ThreadPoolService;
 
 import java.time.LocalDateTime;
@@ -33,12 +35,13 @@ public class CandleChartActivity extends AppCompatActivity {
     public static final String COIN_SYMBOL_KEY = "coin_symbol";
 
     private boolean weeklyCandlesOn = true;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chart_main);
-        ApiService apiService = ApiService.getInstance(getResources());
+        apiService = ApiService.getInstance(getResources());
         String currentCoinName = getIntent().getStringExtra(COIN_NAME_KEY);
         String currentCoinSymbol = getIntent().getStringExtra(COIN_SYMBOL_KEY);
         Objects.requireNonNull(getSupportActionBar()).setTitle(currentCoinSymbol);
@@ -48,17 +51,26 @@ public class CandleChartActivity extends AppCompatActivity {
                     "Please Wait until Loading is Complete.", Toast.LENGTH_SHORT).show();
         });
 
+        CandlesDTO candlesDTO = getCandlesInfo(currentCoinSymbol, currentCoinName);
+        if (Objects.nonNull(candlesDTO)) {
+            draw_chart(currentCoinName, candlesDTO.getWeeklyCandles());
+            findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(candlesDTO));
+        }
+    }
+
+    private CandlesDTO getCandlesInfo(String symbol, String name) {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime startWeek = currentTime.minusDays(7);
         LocalDateTime startMonth = currentTime.minusDays(30);
-
-        CandlesDTO candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
-
-        candlesDTO.setCoinName(currentCoinName);
-        candlesDTO.setCoinSymbol(currentCoinSymbol);
-
-        draw_chart(currentCoinName, candlesDTO.getWeeklyCandles());
-        findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(candlesDTO));
+        try {
+            CandlesDTO candlesDTO = apiService.getCandleInfo(symbol, startWeek, startMonth);
+            candlesDTO.setCoinName(name);
+            candlesDTO.setCoinSymbol(symbol);
+            return candlesDTO;
+        } catch (ApiConnectivityException e) {
+            Toast.makeText(this, "Api not accessible.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
     }
 
     private void toggleCandles(CandlesDTO candlesDTO) {
