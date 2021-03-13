@@ -127,7 +127,8 @@ public class CandleChartActivity extends AppCompatActivity {
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, dataSetTag);
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        candleDataSet.setShadowColor(Color.GRAY);
+        candleDataSet.setShadowColor(Color.rgb(128, 0, 128));
+        candleDataSet.setValueTextColor(Color.BLUE);
         candleDataSet.setShadowWidth(0.5f);
         candleDataSet.setDecreasingColor(Color.RED);
         candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);

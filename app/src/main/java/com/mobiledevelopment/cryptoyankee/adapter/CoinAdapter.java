@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mobiledevelopment.cryptoyankee.MainActivity;
 import com.mobiledevelopment.cryptoyankee.R;
 import com.mobiledevelopment.cryptoyankee.models.coin.CoinDTO;
@@ -89,7 +90,8 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
         holder.coin_symbol.setText(item.getSymbol());
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%.4f", round));
         holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.getPercentChange7D()));
-        Glide.with(holder.itemView).load("https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.getId() + ".png").into(holder.coin_icon);
+        String url = "https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.getId() + ".png";
+        Glide.with(holder.itemView).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.coin_icon);
 
         try {
             bindPercentChangeViews(holder.one_hour_change, item.getPercentChange1H());
