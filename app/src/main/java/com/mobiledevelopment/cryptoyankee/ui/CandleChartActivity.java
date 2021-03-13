@@ -51,17 +51,11 @@ public class CandleChartActivity extends AppCompatActivity {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime startWeek = currentTime.minusDays(7);
         LocalDateTime startMonth = currentTime.minusDays(30);
-        Log.d("time_sweet_time", startWeek.toString() + "reza" + startMonth.toString());
 
         CandlesDTO candlesDTO = apiService.getCandleInfo(currentCoinSymbol, startWeek, startMonth);
 
         candlesDTO.setCoinName(currentCoinName);
         candlesDTO.setCoinSymbol(currentCoinSymbol);
-
-        Log.d("sepi", Integer.toString(candlesDTO.getMonthlyCandles().size()));
-        for (int i = 0; i < 27; i++) {
-            Log.d("candle_debug", candlesDTO.getMonthlyCandles().get(i).toString());
-        }
 
         draw_chart(currentCoinName, candlesDTO.getWeeklyCandles());
         findViewById(R.id.weeklyCandlesToggle).setOnClickListener(view -> toggleCandles(candlesDTO));
