@@ -128,7 +128,7 @@ public class ApiService {
                     }
                     lockCompletableFuture.complete(true);
                 } else {
-                    Log.e("Api", "callCandlesInfoApi->onResponse code: " + response.code());
+                    Log.e("Api", "callCandlesInfoApi->onResponse code: " + response.code() + ".");
                     lockCompletableFuture.complete(false);
                 }
             }

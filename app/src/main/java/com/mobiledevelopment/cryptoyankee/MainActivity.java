@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -54,10 +55,7 @@ public class MainActivity extends AppCompatActivity {
             fetchCoins(false);
             fetchCoins(true);
         });
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
-            runProcessWithLoading(() -> fetchCoins(false));
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> runProcessWithLoading(() -> fetchCoins(false)));
     }
 
     @Override
@@ -79,13 +77,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runProcessWithLoading(Runnable runnable) {
+        CompletableFuture<Boolean> completableFutureLock = new CompletableFuture<>();
+        threadPoolService.execute(() -> {
+            try {
+                runnable.run();
+                completableFutureLock.complete(true);
+            } catch (ApiConnectivityException e) {
+                completableFutureLock.complete(false);
+            }
+        });
         runOnUiThread(() -> {
-            runnable.run();
+            if (!completableFutureLock.join()) {
+                Toast.makeText(MainActivity.this, "API not accessible. Please checkout your network connection.", Toast.LENGTH_SHORT).show();
+                Log.e(LOG_TAG, "Error fetching coins from api");
+            }
             swipeRefreshLayout.setRefreshing(false);
+            coinAdapter.notifyDataSetChanged();
         });
     }
 
-    private void fetchCoins(boolean isFromOffset) {
+    private void fetchCoins(boolean isFromOffset) throws ApiConnectivityException {
         try {
             Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
             List<CoinDTO> coinDTOS = apiService.getCoinsInfo(
@@ -99,10 +110,9 @@ public class MainActivity extends AppCompatActivity {
             else
                 offset.set(loadLimit);
             Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
-            adaptLoadedCoins();
         } catch (ApiConnectivityException e) {
-            Toast.makeText(MainActivity.this, "Api not accessible.", Toast.LENGTH_SHORT).show();
             loadCoins();
+            throw e;
         }
     }
 
@@ -113,13 +123,8 @@ public class MainActivity extends AppCompatActivity {
             coinAdapter.getCoinsMap().put(coin.getId(), modelConverter.getCoinDTO(coin));
         });
         int size = coins.size();
-        adaptLoadedCoins();
         offset.addAndGet(size);
         storedDataSize.set(size);
-    }
-
-    private void adaptLoadedCoins() {
-        coinAdapter.notifyDataSetChanged();
     }
 
     public void showUTLCChart(String coinName, String coinSymbol) {

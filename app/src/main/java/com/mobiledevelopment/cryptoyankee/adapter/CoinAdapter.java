@@ -37,6 +37,7 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     private Loadable loadable;
     @Getter
     private AtomicBoolean isLoading = new AtomicBoolean(false);
+    private final String LOG_TAG = "ca-TAG";
 
     public CoinAdapter(RecyclerView recyclerView, Activity activity, int loadLimit) {
         this.coinsMap = new HashMap<>();
@@ -50,6 +51,7 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                Log.d(LOG_TAG, "page scrolled :" + dy);
                 if (dy > 0) {
                     assert linearLayoutManager != null;
                     int totalItemCount = linearLayoutManager.getItemCount();
