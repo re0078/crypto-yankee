@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private final Map<Integer, CoinDTO> coinsMap = new HashMap<>();
     private Integer loadLimit;
     private Integer maxCoinsCount;
-    private Integer nonCompletePage;
     private final AtomicInteger offset = new AtomicInteger(0);
     private final AtomicInteger storedDataSize = new AtomicInteger(0);
 
@@ -51,10 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.coin_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Price Indication");
         setupBeans();
-        runProcessWithLoading(() -> {
-            fetchCoins(false);
-            fetchCoins(true);
-        });
+        runProcessWithLoading(() -> fetchCoins(false));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Toast.makeText(MainActivity.this, "Please Wait until loading is complete.", Toast.LENGTH_SHORT).show();
             runProcessWithLoading(() -> fetchCoins(false));
@@ -70,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupBeans() {
         loadLimit = getResources().getInteger(R.integer.fetch_limit);
         maxCoinsCount = getResources().getInteger(R.integer.max_poll);
-        nonCompletePage = (maxCoinsCount % loadLimit) == 0 ? 0 : 1;
         apiService = ApiService.getInstance(getResources());
         threadPoolService = ThreadPoolService.getInstance();
         swipeRefreshLayout = findViewById(R.id.rootLayout);
@@ -101,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
                     offset.addAndGet(loadLimit);
                 else
                     offset.set(loadLimit);
-                adaptLoadedCoins();
                 Log.d(LOG_TAG, "size of coinsMap: " + coinsMap.size());
             }
+            adaptLoadedCoins();
         } catch (ApiConnectivityException e) {
             Toast.makeText(MainActivity.this, "Api not accessible.", Toast.LENGTH_SHORT).show();
             loadCoins();

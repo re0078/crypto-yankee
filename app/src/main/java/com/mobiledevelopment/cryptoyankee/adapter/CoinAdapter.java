@@ -54,10 +54,7 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
                     assert linearLayoutManager != null;
                     int totalItemCount = linearLayoutManager.getItemCount();
                     int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    Log.d("ca-TAG", "isLoading: " + isLoading.get() + " tIC: " +
-                            totalItemCount + " lVI: " + lastVisibleItem + " vT: " + visibleThreshold.get());
                     if (totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
-                        Log.d("ca-TAG", "Track #2");
                         if (loadable != null)
                             loadable.onLoadMore();
                         isLoading.set(true);
@@ -70,7 +67,6 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     @NonNull
     @Override
     public CoinViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("Chq", "On create view holder");
         View view = LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.coin_layout, parent, false);
         view.setOnClickListener(v -> (
