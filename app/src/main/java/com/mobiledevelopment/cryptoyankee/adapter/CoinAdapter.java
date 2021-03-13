@@ -56,10 +56,10 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
                     assert linearLayoutManager != null;
                     int totalItemCount = linearLayoutManager.getItemCount();
                     int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    if (totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
+                    if (!isLoading.get() && totalItemCount <= (lastVisibleItem + visibleThreshold.get())) {
+                        isLoading.set(true);
                         if (loadable != null)
                             loadable.onLoadMore();
-                        isLoading.set(true);
                     }
                 }
             }

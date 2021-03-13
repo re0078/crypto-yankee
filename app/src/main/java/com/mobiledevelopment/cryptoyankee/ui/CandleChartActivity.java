@@ -61,6 +61,7 @@ public class CandleChartActivity extends AppCompatActivity {
 
     private void setupChart() {
         CompletableFuture<Boolean> completableFutureLock = new CompletableFuture<>();
+        runOnUiThread(() -> swipeRefreshLayout.setRefreshing(true));
         threadPoolService.execute(() -> {
             try {
                 candlesDTO = getCandlesInfo(currentCoinSymbol, currentCoinName);

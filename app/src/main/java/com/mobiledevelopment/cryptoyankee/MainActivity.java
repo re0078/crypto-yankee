@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void runProcessWithLoading(Runnable runnable) {
         CompletableFuture<Boolean> completableFutureLock = new CompletableFuture<>();
+        runOnUiThread(() -> swipeRefreshLayout.setRefreshing(true));
         threadPoolService.execute(() -> {
             try {
                 runnable.run();
@@ -151,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
             if (coinsMap.size() <= maxCoinsCount) {
                 runProcessWithLoading(() -> {
                     fetchCoins(true);
+//                    coinAdapter.getIsLoading().set(false);
                     coinAdapter.getIsLoading().set(false);
                 });
             } else {
