@@ -21,4 +21,8 @@
     <string name="period_key">period_id</string>
     <string name="period_val">1DAY</string>
     <string name="time_start_key">time_start</string>
+
+    <!--> Coin Icons <!-->
+    <string name="icons_api">https://s2.coinmarketcap.com/static/img/coins/64x64/</string>
+    <string name="png_format">.png</string>
 </resources>

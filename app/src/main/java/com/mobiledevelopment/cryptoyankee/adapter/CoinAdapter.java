@@ -21,6 +21,7 @@ import com.mobiledevelopment.cryptoyankee.ui.CoinViewHolder;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.HttpUrl;
 
 public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
 
@@ -84,16 +86,20 @@ public class CoinAdapter extends RecyclerView.Adapter<CoinViewHolder> {
     public void onBindViewHolder(@NonNull CoinViewHolder holder, int position) {
         CoinDTO item = new ArrayList<>(coinsMap.values()).get(position);
 
-        float usd = Float.parseFloat(item.getPriceUsd()) * 1000000;
-        float round = (float) (Math.round(usd) / 1000000.0);
+        double usd = Double.parseDouble(item.getPriceUsd()) * 1000000;
+        double round = (double) (Math.round(usd) / 1000000.0);
         holder.coin_name.setText(item.getName());
         holder.coin_symbol.setText(item.getSymbol());
         holder.coin_price.setText(String.format(Locale.ENGLISH, "%.4f", round));
         holder.seven_days_change.setText(String.format(Locale.ENGLISH, "%s%%", item.getPercentChange7D()));
-        String url = "https://s2.coinmarketcap.com/static/img/coins/64x64/" + item.getId() + ".png";
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(
+                activity.getResources().getString(R.string.icons_api).
+                        concat(item.getId()).
+                        concat(activity.getResources().getString(R.string.png_format)))).
+                newBuilder();
         Glide
                 .with(holder.itemView)
-                .load(url)
+                .load(builder.build().toString())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .skipMemoryCache(false)
                 .into(holder.coin_icon);
